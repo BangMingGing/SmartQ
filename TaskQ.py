@@ -36,7 +36,7 @@ class Drone():
         self.queue_name = queue_name
         
 
-    def callback(self, ch, method, body):
+    def callback(self, ch, method, properties, body):
         message = pickle.loads(body, encoding='bytes')
 
         print(f'[Drone] message : {message}')
@@ -62,7 +62,7 @@ class Server():
         self.queue_name = queue_name
 
     
-    def callback(self, ch, method, body):
+    def callback(self, ch, method, properties, body):
         message = pickle.loads(body, encoding='bytes')
 
         print(f'[Server] message : {message}')
@@ -86,7 +86,7 @@ class MongoDB():
         self.queue_name = queue_name
 
 
-    def callback(self, ch, method, body):
+    def callback(self, ch, method, properties, body):
         message = pickle.loads(body, encoding='bytes')
 
         print(f'[MongoDB] message : {message}')
