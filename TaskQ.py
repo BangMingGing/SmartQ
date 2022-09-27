@@ -9,7 +9,7 @@ import pickle
 class Publisher():
     def __init__(self, exchange_name, routing_key):
         self.credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, '/', self.credentials))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
         self.channel = self.connection.channel()
 
         self.exchange_name = exchange_name
@@ -28,7 +28,7 @@ class Publisher():
 class Drone():
     def __init__(self, queue_name='Drone', publish_exchange_name='output', publish_routing_key='toMongoDB'):
         self.credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, '/', self.credentials))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
         self.channel = self.connection.channel()
 
         self.publisher = Publisher(exchange_name=publish_exchange_name, routing_key=publish_routing_key)
@@ -56,7 +56,7 @@ class Drone():
 class Server():
     def __init__(self, queue_name='Server'):
         self.credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, '/', self.credentials))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
         self.channel = self.connection.channel()
 
     
@@ -78,7 +78,7 @@ class Server():
 class MongoDB():
     def __init__(self, queue_name='MongoDB'):
         self.credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, '/', self.credentials))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
         self.channel = self.connection.channel()
 
         self.queue_name = queue_name
