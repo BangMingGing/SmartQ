@@ -20,7 +20,7 @@ class Publisher():
         self.channel.basic_publish(
             exchange = self.exchange_name,
             routing_key = self.routing_key,
-            body = message
+            body = pickle.dumps(message)
         )
 
 
@@ -48,7 +48,7 @@ class Drone():
 
     def Consume(self):
         self.channel.basic_consume(on_message_callback=self.callback, queue=self.queue_name)
-        print('Start Consuming')
+        print('[Drone] Start Consuming')
         self.channel.start_consuming()
 
 
@@ -72,7 +72,7 @@ class Server():
     
     def Consume(self):
         self.channel.basic_consume(on_message_callback=self.callback, queue=self.queue_name)
-        print('Start Consuming')
+        print('[Server] Start Consuming')
         self.channel.start_consuming()
 
 
@@ -96,7 +96,7 @@ class MongoDB():
     
     def Consume(self):
         self.channel.basic_consume(on_message_callback=self.callback, queue=self.queue_name)
-        print('Start Consuming')
+        print('[MongoDB] Start Consuming')
         self.channel.start_consuming()
 
 
