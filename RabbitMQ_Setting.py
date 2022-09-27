@@ -5,7 +5,7 @@ RABBITMQ_SERVER_IP = '203.255.57.129'
 RABBITMQ_SERVER_PORT = '5672'
 
 credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
-connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, credentials))
+connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, '/', credentials))
 channel = connection.channel()
 
 
