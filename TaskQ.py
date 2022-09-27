@@ -59,6 +59,8 @@ class Server():
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
         self.channel = self.connection.channel()
 
+        self.queue_name = queue_name
+
     
     def callback(self, ch, method, body):
         message = pickle.loads(body, encoding='bytes')
