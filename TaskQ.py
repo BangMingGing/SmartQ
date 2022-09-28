@@ -108,7 +108,7 @@ if __name__ == '__main__':
     
     run_process = sys.argv[1]
 
-    message = 'hello'
+    message = {'message' : 'hello'}
 
     if run_process == 'Publish':
         process = Publisher(exchange_name='input', routing_key='')
