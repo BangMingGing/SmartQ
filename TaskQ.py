@@ -1,8 +1,5 @@
-from asyncio import QueueEmpty
-import queue
 import sys
 import pika
-import json
 import pickle
 
 
