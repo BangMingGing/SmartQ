@@ -91,7 +91,6 @@ if __name__ == "__main__":
         return pickle.loads(result.content, encoding='bytes')
 
 
-    
     DB.save_spec(get_spec())
     DB.save_test_info(get_test())
     DB.insert_location(get_test())
