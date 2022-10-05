@@ -7,4 +7,5 @@ class Task():
         return n1 + n2
 
     def work(self):
-        self.add(self.num1, self.num2)
+        return {'add_result' : self.add(self.num1, self.num2)}
+        
