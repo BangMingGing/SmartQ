@@ -57,9 +57,9 @@ class IoT_Device():
         result['task_name'] = task_name
 
         import Task
-        start_time = time()
+        start_time = time.time()
         result['result'] = Task.work()
-        result['work_time'] = time() - start_time
+        result['work_time'] = time.time() - start_time
 
         print('result : ', result)
 
