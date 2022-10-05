@@ -2,9 +2,7 @@ import sys
 import pika
 import pickle
 import time
-
-from zmq import device
-from MongoDBtest import DB
+# from MongoDBtest import DB
 
 
 class Publisher():
