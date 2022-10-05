@@ -17,25 +17,16 @@ channel.exchange_declare(exchange='output', exchange_type='direct')
 
 
 
-# Drone Queue 선언
-queue = channel.queue_declare('Drone')
-
-# Server Queue 선언
-queue = channel.queue_declare('Server')
+# IoT_Device1 Queue 선언
+queue = channel.queue_declare('IoT_Device1')
 
 # MongoDB Queue 선언
 queue = channel.queue_declare('MongoDB')
 
 
 
-# (Drone Queue - input Exchange) Binding
-channel.queue_bind(exchange='input', queue="Drone", routing_key='toDrone')
-
-# (Server Queue - input Exchange) Binding
-channel.queue_bind(exchange='input', queue="Server", routing_key='toServer')
-
-# (MongoDB Queue - input Exchange) Binding
-channel.queue_bind(exchange='input', queue="MongoDB", routing_key='toMongoDB')
+# (IoT_Device1 Queue - input Exchange) Binding
+channel.queue_bind(exchange='input', queue="IoT_Device1", routing_key='toIoT_Device1')
 
 
 
