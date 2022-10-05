@@ -1,7 +1,9 @@
 import sys
 import pika
 import pickle
-import requests
+import time
+
+from zmq import device
 from MongoDBtest import DB
 
 
@@ -26,27 +28,40 @@ class Publisher():
 
 
 class IoT_Device():
-    def __init__(self, queue_name, publish_exchange_name, publish_routing_key):
+    def __init__(self, device_name, exchange_name='input', routing_key=''):
         self.credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
         self.channel = self.connection.channel()
 
-        self.queue_name = queue_name
+        self.device_name = device_name
+        self.queue_name = device_name
 
-        self.publisher = Publisher(header='result', exchange_name=publish_exchange_name, routing_key=publish_routing_key)
+        # Queue 선언
+        queue = self.channel.queue_declare(device_name)
+        # Queue-Exchange Binding
+        self.channel.queue_bind(exchange=exchange_name, queue=device_name, routing_key=routing_key)
+
+        self.publisher = Publisher(header='result', exchange_name='output', routing_key='toMongoDB')
 
 
     def callback(self, ch, method, properties, body):
         message = pickle.loads(body, encoding='bytes')['message']
-
+        task_name = message['task_name']
+        contents = message['contents']
+        
         with open('Task.py', 'wb') as f:
-            f.write(message)
+            f.write(contents)
+
+        result = {}
+        result['device_name'] = self.device_name
+        result['task_name'] = task_name
 
         import Task
-        result = Task.work()
+        start_time = time()
+        result['result'] = Task.work()
+        result['work_time'] = time() - start_time
 
-        # 또는 subprocess로 Task.py 실행
-        # print(f'[Drone] message : {message}')
+        print('result : ', result)
 
         self.publisher.Publish(pickle.dumps(result))
 
@@ -61,16 +76,21 @@ class IoT_Device():
 
 
 class MongoDB():
-    def __init__(self, queue_name):
+    def __init__(self, queue_name='MongoDB', exchange_name='output', routing_key='toMongoDB'):
         self.credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
         self.channel = self.connection.channel()
 
         self.queue_name = queue_name
 
+        # Queue 선언
+        queue = self.channel.queue_declare(queue_name)
+        # Queue-Exchange Binding
+        self.channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=routing_key)
+
 
     def callback(self, ch, method, properties, body):
-        message = pickle.loads(body, encoding='bytes')
+        message = pickle.loads(body, encoding='bytes')['message']
 
         print(f'[MongoDB] message : {message}')
         # DB에 저장하는 코드
@@ -96,16 +116,16 @@ if __name__ == '__main__':
     message = {'message' : 'hello'}
 
     if run_process == 'Publish':
-        process = Publisher(header='task1', exchange_name='input', routing_key='')
+        process = Publisher(header='task', exchange_name='input', routing_key='')
         message = 'file'
         process.Publish(message)
-    
-    elif run_process == 'IoT Device':
-        process = IoT_Device(queue_name='IoT_Device1', publish_exchange_name='output', publish_routing_key='toMongoDB')
-        process.Consume()
 
     elif run_process == 'MongoDB':
-        process = MongoDB(queue_name='MongoDB')
+        process = MongoDB()
+        process.Consume()
+
+    else:
+        process = IoT_Device(device_name=run_process)
         process.Consume()
 
     
