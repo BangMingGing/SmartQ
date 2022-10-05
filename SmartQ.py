@@ -4,6 +4,8 @@ import pickle
 import time
 # from MongoDBtest import DB
 
+RABBITMQ_SERVER_IP = '203.255.57.129'
+RABBITMQ_SERVER_PORT = '5672'
 
 class Publisher():
     def __init__(self, header, exchange_name, routing_key):
