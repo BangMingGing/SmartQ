@@ -16,7 +16,7 @@ channel.exchange_declare(exchange='input', exchange_type='fanout')
 channel.exchange_declare(exchange='output', exchange_type='direct')
 
 
-
+"""
 # IoT_Device1 Queue 선언
 queue = channel.queue_declare('IoT_Device1')
 
@@ -32,3 +32,4 @@ channel.queue_bind(exchange='input', queue="IoT_Device1", routing_key='toIoT_Dev
 
 # (MongoDB Queue - output Exchange) Binding
 channel.queue_bind(exchange='output', queue="MongoDB", routing_key='toMongoDB')
+"""

@@ -31,7 +31,6 @@ async def create_files(files: List[bytes] = File(...)):
 
 @app.post("/uploadfiles")
 async def create_upload_files(files: List[UploadFile] = File(...)):
-    UPLOAD_DIRECTORY = "./"
     Publisher = SmartQ.Publisher('task', 'input', '')
     for file in files:
         contents = await file.read()
