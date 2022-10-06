@@ -1,8 +1,9 @@
+import os
 import sys
 import pika
 import pickle
 import time
-
+import importlib
 
 RABBITMQ_SERVER_IP = '203.255.57.129'
 RABBITMQ_SERVER_PORT = '5672'
@@ -48,15 +49,23 @@ class IoT_Device():
         message = pickle.loads(body, encoding='bytes')['message']
         task_name = message['task_name']
         contents = message['contents']
-        
-        with open('Task.py', 'wb') as f:
+
+        dir_path = './TaskList'
+        file_path = f'TaskList/{task_name}'
+        module_path = file_path.replace('.py', '')
+        module_path = module_path.replace('/', '.')
+
+        if not os.path.isdir(dir_path):
+            os.mkdir(dir_path)
+
+        with open(file_path, 'wb+') as f:
             f.write(contents)
 
         result_message = {}
         result_message['device_name'] = self.device_name
         result_message['task_name'] = task_name
 
-        import Task
+        Task = importlib.import_module(module_path)
         Task = Task.Task()
         start_time = time.time()
         result_message['result'] = Task.work()
@@ -64,7 +73,8 @@ class IoT_Device():
 
         print('result : ', result_message)
 
-        self.publisher.Publish(pickle.dumps(result_message))
+        self.publisher.Publish(result_message)
+        # os.remove('./Task.py')
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -77,15 +87,16 @@ class IoT_Device():
 
 
 class MongoDB():
-    def __init__(self, queue_name='MongoDB', exchange_name='output', routing_key='toMongoDB'):
+    def __init__(self, user_name='default_user', queue_name='MongoDB', exchange_name='output', routing_key='toMongoDB'):
         self.credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
         self.channel = self.connection.channel()
 
         self.queue_name = queue_name
+        self.user_name = user_name
 
-        from MongoDB import DB
-        self.DB = DB.DB()
+        import MongoDB
+        self.DB = MongoDB.DB(user_name=self.user_name)
 
         # Queue 선언
         queue = self.channel.queue_declare(queue_name)
@@ -126,7 +137,7 @@ if __name__ == '__main__':
         process.Publish(message)
 
     elif run_process == 'MongoDB':
-        process = MongoDB()
+        process = MongoDB(user_name='bmk')
         process.Consume()
 
     else:
