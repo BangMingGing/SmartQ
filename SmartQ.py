@@ -2,7 +2,7 @@ import sys
 import pika
 import pickle
 import time
-# from MongoDBtest import DB
+
 
 RABBITMQ_SERVER_IP = '203.255.57.129'
 RABBITMQ_SERVER_PORT = '5672'
@@ -52,26 +52,26 @@ class IoT_Device():
         with open('Task.py', 'wb') as f:
             f.write(contents)
 
-        result = {}
-        result['device_name'] = self.device_name
-        result['task_name'] = task_name
+        result_message = {}
+        result_message['device_name'] = self.device_name
+        result_message['task_name'] = task_name
 
         import Task
         Task = Task.Task()
         start_time = time.time()
-        result['result'] = Task.work()
-        result['work_time'] = time.time() - start_time
+        result_message['result'] = Task.work()
+        result_message['work_time'] = time.time() - start_time
 
-        print('result : ', result)
+        print('result : ', result_message)
 
-        self.publisher.Publish(pickle.dumps(result))
+        self.publisher.Publish(pickle.dumps(result_message))
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
     def Consume(self):
         self.channel.basic_consume(on_message_callback=self.callback, queue=self.queue_name)
-        print('[Drone] Start Consuming')
+        print(f'[{self.device_name}] Start Consuming')
         self.channel.start_consuming()
 
 
@@ -84,6 +84,9 @@ class MongoDB():
 
         self.queue_name = queue_name
 
+        from MongoDB import DB
+        self.DB = DB.DB()
+
         # Queue 선언
         queue = self.channel.queue_declare(queue_name)
         # Queue-Exchange Binding
@@ -93,8 +96,9 @@ class MongoDB():
     def callback(self, ch, method, properties, body):
         message = pickle.loads(body, encoding='bytes')['message']
 
-        print(f'[MongoDB] message : {message}')
         # DB에 저장하는 코드
+        self.DB.save_data(message)
+        #print(f'[MongoDB] message : {message}')
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
