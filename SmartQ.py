@@ -74,7 +74,7 @@ class IoT_Device():
         print('result : ', result_message)
 
         self.publisher.Publish(result_message)
-        # os.remove('./Task.py')
+        # os.remove(file_path)
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
