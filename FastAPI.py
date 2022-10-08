@@ -7,7 +7,7 @@ import pika
 from pymongo import MongoClient
 from bson import ObjectId
 from pydantic import BaseModel, Field
-
+import motor.motor_asyncio
 
 app = FastAPI()
 
@@ -27,7 +27,7 @@ channel.exchange_declare(exchange='output', exchange_type='direct')
 MONGODB_SERVER_IP = '203.255.57.129'
 MONGODB_SERVER_PORT = 27017
 
-client = MongoClient(MONGODB_SERVER_IP, MONGODB_SERVER_PORT)
+client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_SERVER_IP, MONGODB_SERVER_PORT)
 db = client['bmk']
 
 class ResultID(ObjectId):
@@ -87,19 +87,19 @@ async def create_upload_files(files: List[UploadFile] = File(...)):
 
 @app.get("/result/search/all", response_description="show all results", response_model=List[ResultModel])
 async def list_results():
-    results = await db['all_data'].find().to_list(1000)
+    results = await db['all_data'].find()
     return results
 
 
 @app.get("/result/search/device/{device_name}", response_description="show device results", response_model=List[ResultModel])
 async def find_devices(device_name):
-    results = await db["all_data"].find({"device_name" : device_name}).to_list(1000)
+    results = await db["all_data"].find({"device_name" : device_name})
     return results
     
 
 @app.get("/result/search/task/{task_name}", response_description="show task_name results", response_model=List[ResultModel])
 async def find_tasks(task_name):
-    results = await db["all_data"].find({"task_name" : task_name}).to_list(1000)
+    results = await db["all_data"].find({"task_name" : task_name})
     return results
 
 

@@ -108,7 +108,7 @@ class MongoDB():
 
         # DB에 저장하는 코드
         self.DB.save_data(message)
-        #print(f'[MongoDB] message : {message}')
+        print(f'[MongoDB] message : {message}')
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
