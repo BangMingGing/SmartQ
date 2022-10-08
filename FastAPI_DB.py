@@ -12,7 +12,7 @@ app = FastAPI()
 
 MONGODB_URL = "mongodb+srv://mgcho:4145@cluster0.psfzyux.mongodb.net/bmk?retryWrites=true&w=majority"
 
-client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
+client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URL)
 
 db = client.bmk
 

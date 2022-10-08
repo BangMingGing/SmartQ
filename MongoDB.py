@@ -1,9 +1,9 @@
 from pymongo import MongoClient
 
 class DB():
-    def __init__(self, user_name='default_user'):
+    def __init__(self):
         client = MongoClient("mongodb+srv://mgcho:4145@cluster0.psfzyux.mongodb.net/test")
-        db1 = client[user_name]
+        db1 = client['bmk']
         self.all_data = db1.all_data
         self.all_data.delete_many({})
     

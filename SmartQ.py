@@ -87,16 +87,15 @@ class IoT_Device():
 
 
 class MongoDB():
-    def __init__(self, user_name='default_user', queue_name='MongoDB', exchange_name='output', routing_key='toMongoDB'):
+    def __init__(self, queue_name='MongoDB', exchange_name='output', routing_key='toMongoDB'):
         self.credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
         self.channel = self.connection.channel()
 
         self.queue_name = queue_name
-        self.user_name = user_name
 
         import MongoDB
-        self.DB = MongoDB.DB(user_name=self.user_name)
+        self.DB = MongoDB.DB()
 
         # Queue 선언
         queue = self.channel.queue_declare(queue_name)
@@ -137,7 +136,7 @@ if __name__ == '__main__':
         process.Publish(message)
 
     elif run_process == 'MongoDB':
-        process = MongoDB(user_name='bmk')
+        process = MongoDB()
         process.Consume()
 
     else:
