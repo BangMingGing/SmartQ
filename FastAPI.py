@@ -87,7 +87,7 @@ async def create_upload_files(files: List[UploadFile] = File(...)):
 
 @app.get("/result/search/all", response_description="show all results", response_model=List[ResultModel])
 async def list_results():
-    results = await db['all_data'].find()
+    results = await db['all_data'].find().to_list(1000)
     return results
 
 

@@ -1,8 +1,11 @@
 from pymongo import MongoClient
 
+MONGODB_SERVER_IP = '203.255.57.129'
+MONGODB_SERVER_PORT = 27017
+
 class DB():
     def __init__(self):
-        client = MongoClient("mongodb+srv://mgcho:4145@cluster0.psfzyux.mongodb.net/test")
+        client = MongoClient(MONGODB_SERVER_IP, MONGODB_SERVER_PORT)
         db1 = client['bmk']
         self.all_data = db1.all_data
         self.all_data.delete_many({})

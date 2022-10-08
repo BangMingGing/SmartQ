@@ -65,10 +65,10 @@ class IoT_Device():
         result_message['device_name'] = self.device_name
         result_message['task_name'] = task_name
 
-        Task = importlib.import_module(module_path)
-        Task = Task.Task()
+        Task_Module = importlib.import_module(module_path)
+        Task_Worker = Task_Module.Task()
         start_time = time.time()
-        result_message['result'] = Task.work()
+        result_message['result'] = Task_Worker.work()
         result_message['work_time'] = time.time() - start_time
 
         print('result : ', result_message)
