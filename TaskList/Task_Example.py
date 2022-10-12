@@ -12,3 +12,5 @@ class Task():
     def wtw(self):
         return 'add 1, 1'
         
+Task_Worker = Task()
+print(Task_Worker.work())

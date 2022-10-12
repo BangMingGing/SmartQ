@@ -3,7 +3,7 @@ import sys
 import pika
 import pickle
 import time
-import importlib
+import subprocess
 
 RABBITMQ_SERVER_IP = '203.255.57.129'
 RABBITMQ_SERVER_PORT = '5672'
@@ -29,6 +29,7 @@ class Publisher():
 
 
 class IoT_Device():
+    
     def __init__(self, device_name, exchange_name='input', routing_key=''):
         self.credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
@@ -36,7 +37,7 @@ class IoT_Device():
 
         self.device_name = device_name
         self.queue_name = device_name
-
+        
         # Queue 선언
         queue = self.channel.queue_declare(device_name)
         # Queue-Exchange Binding
@@ -45,39 +46,37 @@ class IoT_Device():
         self.publisher = Publisher(header='result', exchange_name='output', routing_key='toMongoDB')
 
 
+    
     def callback(self, ch, method, properties, body):
         message = pickle.loads(body, encoding='bytes')['message']
         task_name = message['task_name']
         contents = message['contents']
 
-        dir_path = './TaskList'
-        file_path = f'TaskList/{task_name}'
-        module_path = file_path.replace('.py', '')
-        module_path = module_path.replace('/', '.')
-
-        if not os.path.isdir(dir_path):
-            os.mkdir(dir_path)
-
-        with open(file_path, 'wb+') as f:
+        file_name = f'{task_name}'
+        
+        with open(file_name, 'wb') as f:
             f.write(contents)
+
+        task = ['python', file_name]
 
         result_message = {}
         result_message['device_name'] = self.device_name
         result_message['task_name'] = task_name
 
-        Task_Module = importlib.import_module(module_path)
-        Task_Worker = Task_Module.Task()
         start_time = time.time()
-        result_message['result'] = Task_Worker.work()
+        try:
+            result_message['result'] = subprocess.check_output(task, shell=False, encoding='UTF-8').replace('\n', '/')
+        except Exception:
+            result_message['error'] = Exception
         result_message['work_time'] = time.time() - start_time
+
 
         print('result : ', result_message)
 
         self.publisher.Publish(result_message)
-        # os.remove(file_path)
+        os.remove(file_name)
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
-
 
     def Consume(self):
         self.channel.basic_consume(on_message_callback=self.callback, queue=self.queue_name)
