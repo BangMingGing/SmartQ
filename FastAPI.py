@@ -32,6 +32,7 @@ db = client['bmk']
 
 # default onnx file
 default_files = glob.glob('onnxfile/*.onnx')
+print(default_files)
 
 class ResultID(ObjectId):
     @classmethod
@@ -85,13 +86,13 @@ async def upload_images(files: List[UploadFile] = File(...)):
 
 @app.post("/upload/with_default_model")
 async def with_default_model():
-    global default_files
     Publisher = SmartQ.Publisher('task', 'input', '')
     for file in default_files:
         with open(file, 'rb') as f:
             contents = f.read()
+        task_name = file.replace('onnxfile/', '')
         message = {}
-        message['task_name'] = file.replace('onnxfile/', '')
+        message['task_name'] = task_name
         message['contents'] = contents
         Publisher.Publish(message)
 
@@ -103,10 +104,11 @@ async def with_my_model(files: List[UploadFile] = File(...)):
     global default_files
     Publisher = SmartQ.Publisher('task', 'input', '')
     for file in default_files:
-        with open(f'/onnxfile/{file}', 'rb') as f:
+        with open(file, 'rb') as f:
             contents = f.read()
+        task_name = file.replace('onnxfile/', '')
         message = {}
-        message['task_name'] = file.replace('onnxfile/', '')
+        message['task_name'] = task_name
         message['contents'] = contents
         Publisher.Publish(message)
 
