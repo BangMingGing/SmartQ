@@ -1,7 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException, status
 from fastapi.responses import Response
 from typing import List
-import os
+import glob
 import SmartQ
 import pika
 from pymongo import MongoClient
@@ -31,7 +31,7 @@ client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_SERVER_IP, MONGODB_SERVE
 db = client['bmk']
 
 # default onnx file
-default_files = ['resent18.onnx', 'densenet121.onnx', 'inception_v3.onnx']
+default_files = glob.glob('onnxfile/*.onnx')
 
 class ResultID(ObjectId):
     @classmethod
@@ -88,10 +88,10 @@ async def with_default_model():
     global default_files
     Publisher = SmartQ.Publisher('task', 'input', '')
     for file in default_files:
-        with open(f'/onnxfile/{file}', 'rb') as f:
-            contents = await f.read()
+        with open(file, 'rb') as f:
+            contents = f.read()
         message = {}
-        message['task_name'] = file
+        message['task_name'] = file.replace('onnxfile/', '')
         message['contents'] = contents
         Publisher.Publish(message)
 
@@ -104,9 +104,9 @@ async def with_my_model(files: List[UploadFile] = File(...)):
     Publisher = SmartQ.Publisher('task', 'input', '')
     for file in default_files:
         with open(f'/onnxfile/{file}', 'rb') as f:
-            contents = await f.read()
+            contents = f.read()
         message = {}
-        message['task_name'] = file
+        message['task_name'] = file.replace('onnxfile/', '')
         message['contents'] = contents
         Publisher.Publish(message)
 

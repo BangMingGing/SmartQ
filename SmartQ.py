@@ -54,14 +54,13 @@ class IoT_Device():
         task_name = message['task_name']
         contents = message['contents']
 
-        
-
         if header == 'task':
-            file_path = f'/onnxfile/{task_name}'
-            with open(file_path, 'wb') as f:
+            if not os.path.exists('./onnxfile'):
+                os.mkdir('./onnxfile')
+            with open(f'onnxfile/{task_name}', 'wb') as f:
                 f.write(contents)
 
-            task = ['python', '/task_worker/inference_worker.py', task_name, 'inference_image']
+            task = ['python', 'task_worker/inference_worker.py', task_name, 'inference_image']
 
             result_message = {}
             result_message['device_name'] = self.device_name
@@ -78,12 +77,10 @@ class IoT_Device():
             print('result : ', result_message)
 
             self.publisher.Publish(result_message)
-            os.remove(file_path)
+            os.remove(f'onnxfile/{task_name}')
 
         elif header == 'image':
-            file_name = 'inference_image'
-
-            with open(f'/images/{file_name}', 'wb') as f:
+            with open('inference_image.jpg', 'wb') as f:
                 f.write(contents)
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -130,10 +127,6 @@ class MongoDB():
 
 
 if __name__ == '__main__':
-
-    FAST_API_SERVER_URL = '203.255.57.129:8000'
-    RABBITMQ_SERVER_IP = '203.255.57.129'
-    RABBITMQ_SERVER_PORT = '5672'
     
     run_process = sys.argv[1]
 

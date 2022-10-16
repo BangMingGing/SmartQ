@@ -49,7 +49,7 @@ if __name__ == '__main__':
     image_name = sys.argv[2]
 
     tester = Task_worker(run_process)
-    img = cv.imread(f'../images/{image_name}.jpg')
+    img = cv.imread(f'../{image_name}.jpg')
     # print(img.shape)
     x = tester.preprocess(img)
     x = tester.inference(x)
