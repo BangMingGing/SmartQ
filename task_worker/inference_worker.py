@@ -1,4 +1,4 @@
-
+import sys
 import cv2 as cv
 import numpy as np
 import onnxruntime
@@ -45,9 +45,11 @@ class Task_worker():
 
 
 if __name__ == '__main__':
-    # capture()
-    tester = Task_worker('resnet18')
-    img = cv.imread('../images/pencil.jpg')
+    run_process = sys.argv[1]
+    image_name = sys.argv[2]
+
+    tester = Task_worker(run_process)
+    img = cv.imread(f'../images/{image_name}.jpg')
     # print(img.shape)
     x = tester.preprocess(img)
     x = tester.inference(x)

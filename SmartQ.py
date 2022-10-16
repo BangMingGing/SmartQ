@@ -57,12 +57,11 @@ class IoT_Device():
         
 
         if header == 'task':
-            file_name = f'{task_name}'
-        
-            with open(file_name, 'wb') as f:
+            file_path = f'/onnxfile/{task_name}'
+            with open(file_path, 'wb') as f:
                 f.write(contents)
 
-            task = ['python', file_name]
+            task = ['python', '/task_worker/inference_worker.py', task_name, 'inference_image']
 
             result_message = {}
             result_message['device_name'] = self.device_name
@@ -79,12 +78,12 @@ class IoT_Device():
             print('result : ', result_message)
 
             self.publisher.Publish(result_message)
-            os.remove(file_name)
+            os.remove(file_path)
 
         elif header == 'image':
             file_name = 'inference_image'
 
-            with open(file_name, 'wb') as f:
+            with open(f'/images/{file_name}', 'wb') as f:
                 f.write(contents)
 
         ch.basic_ack(delivery_tag=method.delivery_tag)

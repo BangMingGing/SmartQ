@@ -30,7 +30,7 @@ MONGODB_SERVER_PORT = 27017
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_SERVER_IP, MONGODB_SERVER_PORT)
 db = client['bmk']
 
-# default onnx
+# default onnx file
 default_files = ['resent18.onnx', 'densenet121.onnx', 'inception_v3.onnx']
 
 class ResultID(ObjectId):
@@ -88,7 +88,7 @@ async def with_default_model():
     global default_files
     Publisher = SmartQ.Publisher('task', 'input', '')
     for file in default_files:
-        with open(file, 'rb') as f:
+        with open(f'/onnxfile/{file}', 'rb') as f:
             contents = await f.read()
         message = {}
         message['task_name'] = file
@@ -103,7 +103,7 @@ async def with_my_model(files: List[UploadFile] = File(...)):
     global default_files
     Publisher = SmartQ.Publisher('task', 'input', '')
     for file in default_files:
-        with open(file, 'rb') as f:
+        with open(f'/onnxfile/{file}', 'rb') as f:
             contents = await f.read()
         message = {}
         message['task_name'] = file
