@@ -1,3 +1,4 @@
 import timm 
 
-print(timm.list_models())
+for model in timm.list_models():
+    print(model)
