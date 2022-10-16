@@ -30,6 +30,9 @@ MONGODB_SERVER_PORT = 27017
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_SERVER_IP, MONGODB_SERVER_PORT)
 db = client['bmk']
 
+# default onnx
+default_files = ['resent18.onnx', 'densenet121.onnx', 'inception_v3.onnx']
+
 class ResultID(ObjectId):
     @classmethod
     def __get_validators__(cls):
@@ -72,11 +75,6 @@ async def upload_images(files: List[UploadFile] = File(...)):
     Publisher = SmartQ.Publisher('image', 'input', '')
     for file in files:
         contents = await file.read()
-        """
-        with open(os.path.join(UPLOAD_DIRECTORY, file.filename), "wb") as fp:
-            fp.write(contents)
-        print(file.filename)
-        """
         message = {}
         message['task_name'] = file.filename
         message['contents'] = contents
@@ -87,8 +85,8 @@ async def upload_images(files: List[UploadFile] = File(...)):
 
 @app.post("/upload/with_default_model")
 async def with_default_model():
+    global default_files
     Publisher = SmartQ.Publisher('task', 'input', '')
-    default_files = ['resent18.onnx', 'googlenet.onnx', 'densenet.onnx']
     for file in default_files:
         with open(file, 'rb') as f:
             contents = await f.read()
@@ -102,9 +100,8 @@ async def with_default_model():
 
 @app.post("/upload/with_my_model")
 async def with_my_model(files: List[UploadFile] = File(...)):
+    global default_files
     Publisher = SmartQ.Publisher('task', 'input', '')
-
-    default_files = ['resent18.onnx', 'googlenet.onnx', 'densenet.onnx']
     for file in default_files:
         with open(file, 'rb') as f:
             contents = await f.read()
