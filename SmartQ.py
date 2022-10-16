@@ -60,7 +60,7 @@ class IoT_Device():
             with open(f'onnxfile/{task_name}', 'wb') as f:
                 f.write(contents)
 
-            task = ['python', 'task_worker/inference_worker.py', task_name, 'inference_image']
+            task = ['python', 'task_worker/inference_worker.py', task_name, 'inference_image.jpg']
 
             result_message = {}
             result_message['device_name'] = self.device_name

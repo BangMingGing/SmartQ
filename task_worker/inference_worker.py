@@ -5,19 +5,14 @@ import onnxruntime
 
 class Task_worker():
     def __init__(self, task_name):
-        self.model = onnxruntime.InferenceSession(f"../onnxfile/{task_name}.onnx")
+        self.session = onnxruntime.InferenceSession(f"../onnxfile/{task_name}")
     
     def img2tensor(self, x):
-        while(True):
-            try:
-                x = cv.resize(x, (224, 224))
-                print("resize 224, 224 : ", x.shape)
-                break
-            except Exception as e:
-                print(e)
-                continue
-
-        x = cv.cvtColor(x, cv.COLOR_BGR2RGB)
+        x = cv.resize(x, (224, 224), interpolation=cv.INTER_LINEAR)
+        print("resize 224, 224 : ", x.shape)
+        cv.imwrite('../images/resize_dog.jpg', x)
+                
+        # x = cv.cvtColor(x, cv.COLOR_BGR2RGB)
         x = x.transpose((2, 0, 1))
         print("transpose :", x.shape)
 
@@ -37,7 +32,7 @@ class Task_worker():
         return self.img2tensor(x)
 
     def inference(self, x):
-        return self.model.run(None, {'input': x})[0]
+        return self.session.run(None, {'input': x})[0]
 
     def postprocess(self, x):
         return self.softmax(x)
@@ -49,17 +44,17 @@ if __name__ == '__main__':
     image_name = sys.argv[2]
 
     tester = Task_worker(run_process)
-    img = cv.imread(f'../{image_name}.jpg')
-    # print(img.shape)
-    x = tester.preprocess(img)
+    x = cv.imread(f'../images/{image_name}')
+    print(x.shape)
+    x = tester.preprocess(x)
     x = tester.inference(x)
     x = tester.postprocess(x)
 
     accuracy = np.max(x)
     class_name = np.argmax(x)
 
-    with open('../utils/imagenet_classes.txt', 'r') as f:
+    with open('imagenet_classes.txt', 'r') as f:
         categories = [s.strip() for s in f.readlines()]
 
-    print(f'object:{categories[class_name]}, accuracy:{accuracy}')
+    print(f'object:{categories[class_name]}, accuracy:{accuracy*100}%')
     
