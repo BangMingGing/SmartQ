@@ -85,7 +85,7 @@ async def upload_images(files: List[UploadFile] = File(...)):
     return {"filenames": [file.filename for file in files]}
 
 
-@app.post("/upload/uploadfiles")
+@app.post("/upload/with_default_model")
 async def with_default_model():
     Publisher = SmartQ.Publisher('task', 'input', '')
     default_files = ['resent18.onnx', 'googlenet.onnx', 'densenet.onnx']
@@ -100,8 +100,8 @@ async def with_default_model():
     return {"filenames": default_files}
 
 
-@app.post("/upload/uploadfiles")
-async def create_upload_files(files: List[UploadFile] = File(...)):
+@app.post("/upload/with_my_model")
+async def with_my_model(files: List[UploadFile] = File(...)):
     Publisher = SmartQ.Publisher('task', 'input', '')
 
     default_files = ['resent18.onnx', 'googlenet.onnx', 'densenet.onnx']
