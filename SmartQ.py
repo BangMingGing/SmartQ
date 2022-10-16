@@ -48,33 +48,44 @@ class IoT_Device():
 
     
     def callback(self, ch, method, properties, body):
-        message = pickle.loads(body, encoding='bytes')['message']
+        msg = pickle.loads(body, encoding='bytes')
+        header = msg['header']
+        message = msg['message']
         task_name = message['task_name']
         contents = message['contents']
 
-        file_name = f'{task_name}'
         
-        with open(file_name, 'wb') as f:
-            f.write(contents)
 
-        task = ['python', file_name]
+        if header == 'task':
+            file_name = f'{task_name}'
+        
+            with open(file_name, 'wb') as f:
+                f.write(contents)
 
-        result_message = {}
-        result_message['device_name'] = self.device_name
-        result_message['task_name'] = task_name
+            task = ['python', file_name]
 
-        start_time = time.time()
-        try:
-            result_message['result'] = subprocess.check_output(task, shell=False, encoding='UTF-8').replace('\n', '/')
-        except Exception:
-            result_message['error'] = Exception
-        result_message['work_time'] = time.time() - start_time
+            result_message = {}
+            result_message['device_name'] = self.device_name
+            result_message['task_name'] = task_name
+
+            start_time = time.time()
+            try:
+                result_message['result'] = subprocess.check_output(task, shell=False, encoding='UTF-8').replace('\n', '/')
+            except Exception:
+                result_message['error'] = Exception
+            result_message['work_time'] = time.time() - start_time
 
 
-        print('result : ', result_message)
+            print('result : ', result_message)
 
-        self.publisher.Publish(result_message)
-        os.remove(file_name)
+            self.publisher.Publish(result_message)
+            os.remove(file_name)
+
+        elif header == 'image':
+            file_name = 'inference_image'
+
+            with open(file_name, 'wb') as f:
+                f.write(contents)
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
 

@@ -50,7 +50,7 @@ class ResultModel(BaseModel):
     id: ResultID = Field(default_factory=ResultID, alias="_id")
     device_name: str = Field(...)
     task_name: str = Field(...)
-    result: dict[str,str] = Field(...)
+    result: str = Field(...)
     work_time: str = Field(...)
 
     class Config:
@@ -67,9 +67,9 @@ class ResultModel(BaseModel):
         }
 
 
-@app.post("/uploadfiles")
-async def create_upload_files(files: List[UploadFile] = File(...)):
-    Publisher = SmartQ.Publisher('task', 'input', '')
+@app.post("/upload/uploadimage")
+async def upload_images(files: List[UploadFile] = File(...)):
+    Publisher = SmartQ.Publisher('image', 'input', '')
     for file in files:
         contents = await file.read()
         """
@@ -85,27 +85,65 @@ async def create_upload_files(files: List[UploadFile] = File(...)):
     return {"filenames": [file.filename for file in files]}
 
 
+@app.post("/upload/uploadfiles")
+async def with_default_model():
+    Publisher = SmartQ.Publisher('task', 'input', '')
+    default_files = ['resent18.onnx', 'googlenet.onnx', 'densenet.onnx']
+    for file in default_files:
+        with open(file, 'rb') as f:
+            contents = await f.read()
+        message = {}
+        message['task_name'] = file
+        message['contents'] = contents
+        Publisher.Publish(message)
+
+    return {"filenames": default_files}
+
+
+@app.post("/upload/uploadfiles")
+async def create_upload_files(files: List[UploadFile] = File(...)):
+    Publisher = SmartQ.Publisher('task', 'input', '')
+
+    default_files = ['resent18.onnx', 'googlenet.onnx', 'densenet.onnx']
+    for file in default_files:
+        with open(file, 'rb') as f:
+            contents = await f.read()
+        message = {}
+        message['task_name'] = file
+        message['contents'] = contents
+        Publisher.Publish(message)
+
+    for file in files:
+        contents = await file.read()
+        message = {}
+        message['task_name'] = file.filename
+        message['contents'] = contents
+        Publisher.Publish(message)
+
+    return {"filenames": default_files + [file.filename for file in files]}
+
+
 @app.get("/result/search/all", response_description="show all results", response_model=List[ResultModel])
-async def list_results():
+async def search_all():
     results = await db['all_data'].find().to_list(1000)
     return results
 
 
 @app.get("/result/search/device/{device_name}", response_description="show device results", response_model=List[ResultModel])
-async def find_devices(device_name):
-    results = await db["all_data"].find({"device_name" : device_name})
+async def search_device(device_name):
+    results = await db["all_data"].find({"device_name" : device_name}).to_list(1000)
     return results
     
 
 @app.get("/result/search/task/{task_name}", response_description="show task_name results", response_model=List[ResultModel])
-async def find_tasks(task_name):
-    results = await db["all_data"].find({"task_name" : task_name})
+async def search_task_name(task_name):
+    results = await db["all_data"].find({"task_name" : task_name}).to_list(1000)
     return results
 
 
     
 @app.delete("/result/delete/all", response_description="delete all Device")
-async def delete_Device():
+async def delete_all():
     delete_results = await db["all_data"].delete_many({})
 
     if delete_results.deleted_count == 1:
@@ -115,7 +153,7 @@ async def delete_Device():
     
 
 @app.delete("/result/delete/delete_id/{id}", response_description="delete a id result")
-async def delete_Device(id):
+async def delete_one(id):
     delete_result = await db["all_data"].delete_one({"_id": ResultID(id)})
 
     if delete_result.deleted_count == 1:
