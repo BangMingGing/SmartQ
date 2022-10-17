@@ -5,26 +5,40 @@ import onnxruntime
 
 class Task_worker():
     def __init__(self, task_name):
-        self.session = onnxruntime.InferenceSession(f"../onnxfile/{task_name}")
+        self.session = onnxruntime.InferenceSession(f'../onnxfile/{task_name}')
     
     def img2tensor(self, x):
         x = cv.resize(x, (224, 224), interpolation=cv.INTER_LINEAR)
-        print("resize 224, 224 : ", x.shape)
+        print('resize 224, 224 : ', x.shape)
         cv.imwrite('../images/resize_dog.jpg', x)
                 
-        # x = cv.cvtColor(x, cv.COLOR_BGR2RGB)
+        x = cv.cvtColor(x, cv.COLOR_BGR2RGB)
         x = x.transpose((2, 0, 1))
-        print("transpose :", x.shape)
+        print('transpose :', x.shape)
+        
+        # print('before noramlize : ', x)
+        x = self.imagenet_normalize(x)
+        # print('after normalize : ', x)
 
         x = np.expand_dims(x, axis=0)
-        print("expand dimension : ", x.shape)
+        print('expand dimension : ', x.shape)
         x = x.astype(np.float32)
 
         return x
 
+    def imagenet_normalize(self, x):
+        mean_vec = np.array([0.485, 0.456, 0.406])
+        stddev_vec = np.array([0.229, 0.224, 0.225])
+        norm_img_data = np.zeros(x.shape).astype('float32')
+        for i in range(x.shape[0]):
+            norm_img_data[i, :, :] = (
+                x[i, :, :]/255 - mean_vec[i]) / stddev_vec[i]
+        return norm_img_data
+
+
     def softmax(self, x):
-        c = np.max(x)  # 최댓값
-        exp_a = np.exp(x-c)  # 각각의 원소에 최댓값을 뺀 값에 exp를 취한다. (이를 통해 overflow 방지)
+        c = np.max(x)
+        exp_a = np.exp(x-c)
         sum_exp_a = np.sum(exp_a)
         return exp_a / sum_exp_a
 
@@ -45,7 +59,7 @@ if __name__ == '__main__':
 
     tester = Task_worker(run_process)
     x = cv.imread(f'../images/{image_name}')
-    print(x.shape)
+    print('raw data shape : ',x.shape)
     x = tester.preprocess(x)
     x = tester.inference(x)
     x = tester.postprocess(x)
