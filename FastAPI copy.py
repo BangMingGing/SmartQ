@@ -1,5 +1,6 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, status
+from fastapi import FastAPI, File, UploadFile, HTTPException, status, Request
 from fastapi.responses import Response
+from fastapi.templating import Jinja2Templates
 from typing import List
 import glob
 import SmartQ
@@ -67,7 +68,21 @@ class ResultModel(BaseModel):
             }
         }
 
+templates = Jinja2Templates(directory="html")
 app = FastAPI()
+
+
+@app.get("/")
+async def home(request : Request):
+    return templates.TemplateResponse("/home.html", {"request":request})
+
+
+
+@app.get("/inference")
+async def inference(request : Request):
+    return templates.TemplateResponse("/inference.html", {"request":request})
+
+
 
 
 @app.post("/upload/uploadimage")
