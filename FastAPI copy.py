@@ -76,81 +76,44 @@ app = FastAPI()
 async def home(request : Request):
     return templates.TemplateResponse("/home.html", {"request":request})
 
-
-
 @app.get("/inference")
 async def inference(request : Request):
     return templates.TemplateResponse("/inference.html", {"request":request})
 
+@app.get("/searchresult")
+async def inference(request : Request):
+    return templates.TemplateResponse("/searchresult.html", {"request":request})
+
+@app.post("/custommodel")
+async def inference(request : Request):
+    return templates.TemplateResponse("/custommodel.html", {"request":request})
 
 
 
-@app.post("/upload/uploadimage")
-async def upload_images(files: List[UploadFile] = File(...)):
-    Publisher = SmartQ.Publisher('image', 'input', '')
-    for file in files:
-        contents = await file.read()
-        message = {}
-        message['task_name'] = file.filename
-        message['contents'] = contents
-        Publisher.Publish(message)
-
-    return {"filenames": [file.filename for file in files]}
+@app.post("/inference/saveandexecute")
+async def saveandexecute(files: List[UploadFile] = File(...)):
+    # write codes
+    # 1. build onnx with selected model
+    # 2. publish img.jpg, inference worker.py, imagenet_classes.txt for setting (once)
+    # 3. publish model.onnx for inference (x selected model count)
+    print("hi")
 
 
-@app.post("/upload/with_default_model")
-async def with_default_model():
-    Publisher = SmartQ.Publisher('task', 'input', '')
-    for file in default_files:
-        with open(file, 'rb') as f:
-            contents = f.read()
-        task_name = file.replace('onnxfile/', '')
-        message = {}
-        message['task_name'] = task_name
-        message['contents'] = contents
-        Publisher.Publish(message)
-
-    return {"filenames": default_files}
-
-
-@app.post("/upload/with_my_model")
-async def with_my_model(files: List[UploadFile] = File(...)):
-    global default_files
-    Publisher = SmartQ.Publisher('task', 'input', '')
-    for file in default_files:
-        with open(file, 'rb') as f:
-            contents = f.read()
-        task_name = file.replace('onnxfile/', '')
-        message = {}
-        message['task_name'] = task_name
-        message['contents'] = contents
-        Publisher.Publish(message)
-
-    for file in files:
-        contents = await file.read()
-        message = {}
-        message['task_name'] = file.filename
-        message['contents'] = contents
-        Publisher.Publish(message)
-
-    return {"filenames": default_files + [file.filename for file in files]}
-
-
-@app.get("/result/search/all", response_description="show all results", response_model=List[ResultModel])
+@app.get("/searchresult/all", response_description="show all results", response_model=List[ResultModel])
 async def search_all():
     results = await db['all_data'].find().to_list(1000)
     return results
 
 
-@app.get("/result/search/device/{device_name}", response_description="show device results", response_model=List[ResultModel])
+@app.get("/searchresult/device_name/{device_name}", response_description="show device results", response_model=List[ResultModel])
 async def search_device(device_name):
     results = await db["all_data"].find({"device_name" : device_name}).to_list(1000)
     return results
     
 
-@app.get("/result/search/task/{task_name}", response_description="show task_name results", response_model=List[ResultModel])
+@app.get("/searchresult/model_name/{task_name}", response_description="show task_name results", response_model=List[ResultModel])
 async def search_task_name(task_name):
-    results = await db["all_data"].find({"task_name" : task_name}).to_list(1000)
+    results = await db["all_data"].find({"model_name" : task_name}).to_list(1000)
     return results
 
 
@@ -163,13 +126,3 @@ async def delete_all():
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"Result not found")
-    
-
-@app.delete("/result/delete/delete_id/{id}", response_description="delete a id result")
-async def delete_one(id):
-    delete_result = await db["all_data"].delete_one({"_id": ResultID(id)})
-
-    if delete_result.deleted_count == 1:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-    raise HTTPException(status_code=404, detail=f"Result {id} not found")
