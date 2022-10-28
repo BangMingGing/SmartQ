@@ -55,12 +55,10 @@ class IoT_Device():
         contents = message['contents']
 
         if header == 'task':
-            if not os.path.exists('./onnxfile'):
-                os.mkdir('./onnxfile')
-            with open(f'onnxfile/{task_name}', 'wb') as f:
+            with open(f'{task_name}', 'wb') as f:
                 f.write(contents)
 
-            task = ['python', 'task_worker/inference_worker.py', task_name, 'inference_image.jpg']
+            task = ['python', 'inference_worker.py', task_name, 'inference_image.jpg']
 
             result_message = {}
             result_message['device_name'] = self.device_name
@@ -77,7 +75,7 @@ class IoT_Device():
             print('result : ', result_message)
 
             self.publisher.Publish(result_message)
-            os.remove(f'onnxfile/{task_name}')
+            os.remove(f'{task_name}')
 
         elif header == 'image':
             with open('inference_image.jpg', 'wb') as f:

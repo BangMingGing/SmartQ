@@ -5,7 +5,7 @@ import onnxruntime
 
 class Task_worker():
     def __init__(self, task_name):
-        self.session = onnxruntime.InferenceSession(f'onnxfile/{task_name}')
+        self.session = onnxruntime.InferenceSession(f'{task_name}')
     
     def img2tensor(self, x):
         x = cv.resize(x, (224, 224), interpolation=cv.INTER_LINEAR)
