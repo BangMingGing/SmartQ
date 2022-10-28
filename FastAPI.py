@@ -87,7 +87,7 @@ async def upload_images(files: List[UploadFile] = File(...)):
 
 
 @app.post("/upload/select_model", description='resent18, densenet121, inception_v3')
-async def with_default_model(Model_names: Model_names):
+async def with_default_model(Model_names: List[str]):
     
     Publisher = SmartQ.Publisher('task', 'input', '')
     for model in Model_names:
