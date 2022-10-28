@@ -1,10 +1,110 @@
 <html>
-    <head>
-        <title>추론</title>
-    </head>
-    <body>
-        <h1>추론</h1>
-            <button onclick  = "location.href = 'http://203.255.57.129:8000/inference'">추론</button>
-            <br>
-    </body>
+
+<head>
+    <title>추론</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * @param {string} formSelector
+         * @return {object | null}
+         */
+        function serializeForm(formSelector) {
+            const formElm = document.documentElement.querySelector(formSelector);
+            if (formElm === null) {
+                alert('failed to find form element');
+                return null;
+            }
+
+            const values = {};
+            for (const childElm of formElm.elements) {
+                if (!(childElm instanceof HTMLInputElement)) {
+                    continue;
+                }
+
+                switch (childElm.type.toLowerCase()) {
+                    case 'checkbox': {
+                        if (childElm.attributes.hasOwnProperty('data-group')) {
+                            const groupName = childElm.attributes['data-group'].value;
+                            if (!(groupName in values)) {
+                                values[groupName] = [];
+                            }
+
+                            if (childElm.checked) {
+                                values[groupName].push(childElm.value);
+                            }
+                        }
+                        else {
+                            values[childElm.name] = childElm.checked;
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            return values;
+        }
+
+        function readAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                if (!file)
+                    reject('invalid argument: file is invalid');
+                
+                const fileReader = new FileReader();
+                fileReader.addEventListener('load', () => {
+                    resolve(fileReader.result);
+                }, false);
+
+                fileReader.readAsDataURL(file);
+            });
+        }
+
+        async function requestToInference() {
+            const [file] = document.documentElement.querySelector('#inf-form input[type="file"]')?.files;
+            if (!file) 
+                return false;
+
+            const fileContentPromise = readAsBase64(file);
+
+            const payload = serializeForm('#inf-form');
+            if (payload == null) {
+                return false;
+            }
+
+            payload.image = await fileContentPromise;
+            if (!payload.image.startsWith('data:image/')) {
+                alert('Please select valid image file !');
+                return false;
+            }
+
+            const res = await fetch(location.origin + '/inference', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+        }
+    </script>
+
+    <h1>추론</h1>
+    <form id='inf-form' method='post' onsubmit='return (requestToInference(), false);'>
+        <label for='text'>이미지 업로드</label><br />
+        <input type='file' name='image_file' accept='image/*' placeholder='upload image'
+            required='required'><br /><br />
+        <label for='model_name'>AI 모델 선택</label><br />
+        <input type='checkbox' data-group='model_names' value='resnet18'>resnet18
+        <input type='checkbox' data-group='model_names' value='densenet121'>densenet121
+        <input type='checkbox' data-group='model_names' value='inception_v3'>inception_v3
+
+        <br />
+        <br />
+
+        <input type='submit' name='submitButton' value='추론 시작'>
+        <input type='reset' value='초기화'>
+    </form>
+</body>
+
 </html>

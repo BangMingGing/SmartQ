@@ -46,6 +46,9 @@ class ResultID(ObjectId):
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
 
+class Model_names(BaseModel):
+    model_names: List[str]
+
 
 class ResultModel(BaseModel):
     id: ResultID = Field(default_factory=ResultID, alias="_id")
@@ -70,7 +73,7 @@ class ResultModel(BaseModel):
 app = FastAPI()
 
 
-@app.post("/upload/uploadimage")
+@app.post("/upload/upload_image")
 async def upload_images(files: List[UploadFile] = File(...)):
     Publisher = SmartQ.Publisher('image', 'input', '')
     for file in files:
@@ -83,61 +86,26 @@ async def upload_images(files: List[UploadFile] = File(...)):
     return {"filenames": [file.filename for file in files]}
 
 
-@app.post("/upload/with_default_model")
-async def with_default_model():
+@app.post("/upload/select_model", description='resent18, densenet121, inception_v3')
+async def with_default_model(Model_names: Model_names):
+    
     Publisher = SmartQ.Publisher('task', 'input', '')
-    for file in default_files:
-        with open(file, 'rb') as f:
+    for model in Model_names:
+        with open(f'onnxfile/{model}.onnx', 'rb') as f:
             contents = f.read()
-        task_name = file.replace('onnxfile/', '')
         message = {}
-        message['task_name'] = task_name
+        message['task_name'] = f'{model}.onnx'
         message['contents'] = contents
         Publisher.Publish(message)
 
     return {"filenames": default_files}
 
 
-@app.post("/upload/with_my_model")
-async def with_my_model(files: List[UploadFile] = File(...)):
-    global default_files
-    Publisher = SmartQ.Publisher('task', 'input', '')
-    for file in default_files:
-        with open(file, 'rb') as f:
-            contents = f.read()
-        task_name = file.replace('onnxfile/', '')
-        message = {}
-        message['task_name'] = task_name
-        message['contents'] = contents
-        Publisher.Publish(message)
-
-    for file in files:
-        contents = await file.read()
-        message = {}
-        message['task_name'] = file.filename
-        message['contents'] = contents
-        Publisher.Publish(message)
-
-    return {"filenames": default_files + [file.filename for file in files]}
-
 
 @app.get("/result/search/all", response_description="show all results", response_model=List[ResultModel])
 async def search_all():
     results = await db['all_data'].find().to_list(1000)
     return results
-
-
-@app.get("/result/search/device/{device_name}", response_description="show device results", response_model=List[ResultModel])
-async def search_device(device_name):
-    results = await db["all_data"].find({"device_name" : device_name}).to_list(1000)
-    return results
-    
-
-@app.get("/result/search/task/{task_name}", response_description="show task_name results", response_model=List[ResultModel])
-async def search_task_name(task_name):
-    results = await db["all_data"].find({"task_name" : task_name}).to_list(1000)
-    return results
-
 
     
 @app.delete("/result/delete/all", response_description="delete all Device")
@@ -148,13 +116,3 @@ async def delete_all():
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"Result not found")
-    
-
-@app.delete("/result/delete/delete_id/{id}", response_description="delete a id result")
-async def delete_one(id):
-    delete_result = await db["all_data"].delete_one({"_id": ResultID(id)})
-
-    if delete_result.deleted_count == 1:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-    raise HTTPException(status_code=404, detail=f"Result {id} not found")

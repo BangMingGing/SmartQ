@@ -82,6 +82,7 @@ class IoT_Device():
         elif header == 'image':
             with open('inference_image.jpg', 'wb') as f:
                 f.write(contents)
+            print("image saved")
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
