@@ -85,6 +85,7 @@ class IoT_Device():
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def Consume(self):
+        self.channel.basic_qos(prefetch_count=1)
         self.channel.basic_consume(on_message_callback=self.callback, queue=self.queue_name)
         print(f'[{self.device_name}] Start Consuming')
         self.channel.start_consuming()

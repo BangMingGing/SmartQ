@@ -8,7 +8,7 @@ class Task_worker():
         self.session = onnxruntime.InferenceSession(f'{task_name}')
     
     def img2tensor(self, x):
-        x = cv.resize(x, (224, 224), interpolation=cv.INTER_LINEAR)
+        x = cv.resize(x, (224, 224))
                 
         x = cv.cvtColor(x, cv.COLOR_BGR2RGB)
         x = x.transpose((2, 0, 1))

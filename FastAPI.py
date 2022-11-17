@@ -98,7 +98,7 @@ async def with_default_model(Model_names: List[str]):
         message['contents'] = contents
         Publisher.Publish(message)
 
-    return {"filenames": default_files}
+    return {"filenames": Model_names}
 
 
 
@@ -111,8 +111,4 @@ async def search_all():
 @app.delete("/result/delete/all", response_description="delete all Device")
 async def delete_all():
     delete_results = await db["all_data"].delete_many({})
-
-    if delete_results.deleted_count == 1:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-    raise HTTPException(status_code=404, detail=f"Result not found")
+    return ("delete complete")

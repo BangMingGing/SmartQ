@@ -74,12 +74,13 @@
             }
 
             payload.image = await fileContentPromise;
+            console.log(payload.image)
             if (!payload.image.startsWith('data:image/')) {
                 alert('Please select valid image file !');
                 return false;
             }
 
-            const res = await fetch(location.origin + '/inference', {
+            const res = await fetch(location.origin + '/home/get_inference_page/inference_request', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -90,6 +91,7 @@
     </script>
 
     <h1>추론</h1>
+    
     <form id='inf-form' method='post' onsubmit='return (requestToInference(), false);'>
         <label for='text'>이미지 업로드</label><br />
         <input type='file' name='image_file' accept='image/*' placeholder='upload image'
