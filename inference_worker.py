@@ -65,3 +65,4 @@ if __name__ == '__main__':
 
     print(f'object:{categories[class_name]}, accuracy:{accuracy*100}%')
     
+    
