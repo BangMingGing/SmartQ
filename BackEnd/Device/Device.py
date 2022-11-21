@@ -5,7 +5,8 @@ import pickle
 import time
 import subprocess
 
-from .. import Publish
+sys.path.append('..')
+import Publish
 
 RABBITMQ_SERVER_IP = '203.255.57.129'
 RABBITMQ_SERVER_PORT = '5672'
