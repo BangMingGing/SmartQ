@@ -55,8 +55,6 @@ class MongoDB():
 
 if __name__ == '__main__':
     
-    run_process = sys.argv[1]
-
     process = MongoDB()
     process.Consume()
 
