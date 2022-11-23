@@ -83,6 +83,10 @@ class InferenceRequest(BaseModel):
     model_names: List[str]
 
 
+class CustomModelRequest(BaseModel):
+    onnx: str
+    custom_model_name: str
+
 
 templates = Jinja2Templates(directory="../FrontEnd")
 app = FastAPI()
@@ -147,6 +151,17 @@ async def inference_request(request: Request, req: InferenceRequest):
 
 
     return templates.TemplateResponse("/inference.html", {"request":request})
+
+
+@app.post("/home/get_custom_model_page/save_custom_model", status_code=status.HTTP_200_OK)
+async def save_custom_model(request: Request, req: CustomModelRequest):
+
+    req.onnx = req.onnx[req.onnx.find(',') + 1:]
+    img = np.frombuffer(base64.b64decode(req.onnx), np.uint8)
+    img = cv2.imdecode(img, cv2.IMREAD_COLOR)
+    cv2.imwrite(f'../onnxfile/{req.custom_model_name}', img)
+
+    return templates.TemplateResponse("/custommodel.html", {"request":request})
 
 
 
