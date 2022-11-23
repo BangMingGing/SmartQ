@@ -90,30 +90,37 @@ app = FastAPI()
 
 @app.get("/home")
 async def home(request : Request):
-    return templates.TemplateResponse("/home.html", {"request":request})
+    context = {'request': request}
+    return templates.TemplateResponse("/home.html", context)
 
 @app.get("/home/get_inference_page")
 async def inference(request : Request):
-    return templates.TemplateResponse("/inference.html", {"request":request})
+    model_list = glob.glob('../onnxfile/*.onnx')
+    context = {'request': request, 'model_list': model_list}
+    return templates.TemplateResponse("/inference.html", context)
 
 @app.get("/home/get_search_result_page")
 async def inference(request : Request):
-    return templates.TemplateResponse("/searchresult.html", {"request":request})
+    context = {'request': request}
+    return templates.TemplateResponse("/searchresult.html", context)
 
 @app.post("/home/get_custom_model_page")
 async def inference(request : Request):
-    return templates.TemplateResponse("/custommodel.html", {"request":request})
+    context = {'request': request}
+    return templates.TemplateResponse("/custommodel.html", context)
 
 
 
 @app.post("/home/get_inference_page/inference_request", status_code=status.HTTP_200_OK)
 async def inference_request(request: Request, req: InferenceRequest):
 
+    # save_image(req.image)
     req.image = req.image[req.image.find(',') + 1:]
     img = np.frombuffer(base64.b64decode(req.image), np.uint8)
     img = cv2.imdecode(img, cv2.IMREAD_COLOR)
     cv2.imwrite('../images/inference_image.jpg', img)
     
+    # publish_image()
     Publisher_image = Publish.Publisher('image', 'input', '')
     with open('../images/inference_image.jpg', 'rb') as f:
         contents = f.read()
@@ -122,6 +129,7 @@ async def inference_request(request: Request, req: InferenceRequest):
     message['contents'] = contents
     Publisher_image.Publish(message)
 
+    # publish_model()
     Publisher_model = Publish.Publisher('model', 'input', '')
     for model in req.model_names:
         with open(f'../onnxfile/{model}.onnx', 'rb') as f:
