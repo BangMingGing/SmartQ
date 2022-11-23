@@ -93,12 +93,12 @@ app = FastAPI()
 
 
 @app.get("/home")
-async def home(request : Request):
+async def home_page(request : Request):
     context = {'request': request}
     return templates.TemplateResponse("/home.html", context)
 
 @app.get("/home/get_inference_page")
-async def inference(request : Request):
+async def inference_page(request : Request):
     model_path = glob.glob('../onnxfile/*.onnx')
     model_names = []
     for model in model_path:
@@ -110,12 +110,12 @@ async def inference(request : Request):
     return templates.TemplateResponse("/inference.html", context)
 
 @app.get("/home/get_search_result_page")
-async def inference(request : Request):
+async def search_result_page(request : Request):
     context = {'request': request}
     return templates.TemplateResponse("/searchresult.html", context)
 
 @app.post("/home/get_custom_model_page")
-async def inference(request : Request):
+async def custom_model_page(request : Request):
     context = {'request': request}
     return templates.TemplateResponse("/custommodel.html", context)
 
