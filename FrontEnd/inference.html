@@ -97,7 +97,7 @@
         <input type='file' name='image_file' accept='image/*' placeholder='upload image'
             required='required'><br /><br />
         <label for='model_name'>AI 모델 선택</label><br />
-        {% for model in model_list %}
+        {% for model in model_names %}
             <input type='checkbox' data-group='model_names' value='{{model}}'>{{ model }}
         {% endfor %}
         <br />

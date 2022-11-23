@@ -95,8 +95,14 @@ async def home(request : Request):
 
 @app.get("/home/get_inference_page")
 async def inference(request : Request):
-    model_list = glob.glob('../onnxfile/*.onnx')
-    context = {'request': request, 'model_list': model_list}
+    model_path = glob.glob('../onnxfile/*.onnx')
+    model_names = []
+    for model in model_path:
+        model_tmp = model.replace('../onnxfile/', '')
+        model_name = model_tmp.replace('.onnx', '')
+        model_names.append(model_name)
+        print(model_name)
+    context = {'request': request, 'model_names': model_names}
     return templates.TemplateResponse("/inference.html", context)
 
 @app.get("/home/get_search_result_page")
