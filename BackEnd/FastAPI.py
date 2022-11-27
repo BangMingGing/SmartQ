@@ -4,13 +4,10 @@ import glob
 import motor.motor_asyncio
 import pika
 import numpy as np
-
-
 from fastapi import FastAPI, status, Request
 from fastapi.templating import Jinja2Templates
 from typing import List
 import utils as ut
-
 
 # RabbitMQ
 RABBITMQ_SERVER_IP = '203.255.57.129'
@@ -32,12 +29,10 @@ client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_SERVER_IP, MONGODB_SERVE
 db = client['bmk']
 
 
-# FastAPI
 templates = Jinja2Templates(directory="../FrontEnd")
 app = FastAPI()
 
 
-# Get Home Page
 @app.get("/home")
 async def home_page(request : Request):
     context = {'request': request}
@@ -70,7 +65,6 @@ async def custom_model_page(request : Request):
 
 
 
-# Inference request, it save image, publish image and models
 @app.post("/home/get_inference_page/inference_request", status_code=status.HTTP_200_OK)
 async def inference_request(request: Request, req: ut.InferenceRequest):
 
@@ -100,9 +94,8 @@ async def inference_request(request: Request, req: ut.InferenceRequest):
     return templates.TemplateResponse("/inference.html", context)
 
 
-# Custom Model Request, it save custom onnx model
-@app.post("/home/get_custom_model_page/custom_model_request", status_code=status.HTTP_200_OK)
-async def custom_model_request(request: Request, req: ut.CustomModelRequest):
+@app.post("/home/get_custom_model_page/save_custom_model", status_code=status.HTTP_200_OK)
+async def save_custom_model(request: Request, req: ut.CustomModelRequest):
     print(req.custom_model_name)
     
     req.onnx = req.onnx[req.onnx.find(',') + 1:]
@@ -112,6 +105,7 @@ async def custom_model_request(request: Request, req: ut.CustomModelRequest):
 
     context = {'request': request}
     return templates.TemplateResponse("/custommodel.html", context)
+
 
 
 @app.get("/home/get_search_result_page/search_result/all", response_description="show all results", response_model=List[ut.ResultModel])
@@ -130,8 +124,6 @@ async def search_device_name(device_name):
 async def search_model_name(model_name):
     results = await db["all_data"].find({"model_name" : model_name}).to_list(1000)
     return results
-
-
     
 @app.delete("/result/delete/all", response_description="delete all Device")
 async def delete_all():
