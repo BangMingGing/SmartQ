@@ -12,11 +12,12 @@ RABBITMQ_SERVER_IP = '203.255.57.129'
 RABBITMQ_SERVER_PORT = '5672'
 
 
-class IoT_Device():
+class Device():
     
     def __init__(self, device_name, exchange_name='input', routing_key=''):
         self.credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters \
+            (RABBITMQ_SERVER_IP, RABBITMQ_SERVER_PORT, 'vhost', self.credentials))
         self.channel = self.connection.channel()
 
         self.device_name = device_name
@@ -42,7 +43,7 @@ class IoT_Device():
             with open(f'{model_name}', 'wb') as f:
                 f.write(contents)
 
-            model = ['python', 'inference_worker.py', model_name, 'inference_image.jpg']
+            model = ['python', 'Inference_worker.py', model_name, 'inference_image.jpg']
 
             result_message = {}
             result_message['device_name'] = self.device_name
@@ -58,7 +59,7 @@ class IoT_Device():
 
             print('result : ', result_message)
 
-            self.publisher.Publish(result_message)
+            self.publisher.publish(result_message)
             os.remove(f'{model_name}')
 
         elif header == 'image':
@@ -68,7 +69,7 @@ class IoT_Device():
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    def Consume(self):
+    def consume(self):
         self.channel.basic_qos(prefetch_count=1)
         self.channel.basic_consume(on_message_callback=self.callback, queue=self.queue_name)
         print(f'[{self.device_name}] Start Consuming')
@@ -80,7 +81,7 @@ if __name__ == '__main__':
     
     run_process = sys.argv[1]
 
-    process = IoT_Device(device_name=run_process)
-    process.Consume()
+    process = Device(device_name=run_process)
+    process.consume()
 
     

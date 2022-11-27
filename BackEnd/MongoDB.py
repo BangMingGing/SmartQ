@@ -45,7 +45,7 @@ class MongoDB():
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     
-    def Consume(self):
+    def consume(self):
         self.channel.basic_consume(on_message_callback=self.callback, queue=self.queue_name)
         print('[MongoDB] Start Consuming')
         self.channel.start_consuming()
@@ -55,7 +55,7 @@ class MongoDB():
 if __name__ == '__main__':
     
     process = MongoDB()
-    process.Consume()
+    process.consume()
 
 
     
