@@ -4,13 +4,10 @@ import glob
 import motor.motor_asyncio
 import pika
 import numpy as np
-
-
 from fastapi import FastAPI, status, Request
 from fastapi.templating import Jinja2Templates
 from typing import List
 import utils as ut
-
 
 # RabbitMQ
 RABBITMQ_SERVER_IP = '203.255.57.129'
@@ -31,10 +28,8 @@ MONGODB_SERVER_PORT = 27017
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_SERVER_IP, MONGODB_SERVER_PORT)
 db = client['bmk']
 
-
 templates = Jinja2Templates(directory="../FrontEnd")
 app = FastAPI()
-
 
 @app.get("/home")
 async def home_page(request : Request):
@@ -62,8 +57,6 @@ async def search_result_page(request : Request):
 async def custom_model_page(request : Request):
     context = {'request': request}
     return templates.TemplateResponse("/custommodel.html", context)
-
-
 
 @app.post("/home/get_inference_page/inference_request", status_code=status.HTTP_200_OK)
 async def inference_request(request: Request, req: ut.InferenceRequest):
@@ -96,7 +89,6 @@ async def inference_request(request: Request, req: ut.InferenceRequest):
     context = {'request': request}
     return templates.TemplateResponse("/inference.html", context)
 
-
 @app.post("/home/get_custom_model_page/save_custom_model", status_code=status.HTTP_200_OK)
 async def save_custom_model(request: Request, req: ut.CustomModelRequest):
     print(req.custom_model_name)
@@ -109,8 +101,6 @@ async def save_custom_model(request: Request, req: ut.CustomModelRequest):
 
     context = {'request': request}
     return templates.TemplateResponse("/custommodel.html", context)
-
-
 
 @app.get("/home/get_search_result_page/search_result/all", response_description="show all results", response_model=List[ut.ResultModel])
 async def search_all():
@@ -128,8 +118,6 @@ async def search_device_name(device_name):
 async def search_model_name(model_name):
     results = await db["all_data"].find({"model_name" : model_name}).to_list(1000)
     return results
-
-
     
 @app.delete("/result/delete/all", response_description="delete all Device")
 async def delete_all():
