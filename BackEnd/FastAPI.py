@@ -1,21 +1,17 @@
 import base64
-import glob
-import string
-from typing import List
-
 import cv2
+import glob
 import motor.motor_asyncio
 import pika
-import uvicorn
 import numpy as np
+
 from bson import ObjectId
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, status, Request, Depends
+from fastapi import FastAPI, status, Request
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import Response, HTMLResponse
 from pydantic import BaseModel, Field
+from typing import List
 
 import Publish
-
 
 
 # RabbitMQ
@@ -37,9 +33,6 @@ MONGODB_SERVER_PORT = 27017
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_SERVER_IP, MONGODB_SERVER_PORT)
 db = client['bmk']
 
-# default onnx file
-default_files = glob.glob('../onnxfile/*.onnx')
-# print(default_files)
 
 class ResultID(ObjectId):
     @classmethod
@@ -114,7 +107,7 @@ async def search_result_page(request : Request):
     context = {'request': request}
     return templates.TemplateResponse("/searchresult.html", context)
 
-@app.post("/home/get_custom_model_page")
+@app.get("/home/get_custom_model_page")
 async def custom_model_page(request : Request):
     context = {'request': request}
     return templates.TemplateResponse("/custommodel.html", context)
@@ -155,11 +148,13 @@ async def inference_request(request: Request, req: InferenceRequest):
 
 @app.post("/home/get_custom_model_page/save_custom_model", status_code=status.HTTP_200_OK)
 async def save_custom_model(request: Request, req: CustomModelRequest):
-
+    print(req.custom_model_name)
+    
     req.onnx = req.onnx[req.onnx.find(',') + 1:]
-    img = np.frombuffer(base64.b64decode(req.onnx), np.uint8)
-    img = cv2.imdecode(img, cv2.IMREAD_COLOR)
-    cv2.imwrite(f'../onnxfile/{req.custom_model_name}', img)
+    print(req.onnx[:100])
+    model = np.frombuffer(base64.b64decode(req.onnx), np.uint8)
+    with open(f'../onnxfile/{req.custom_model_name}.onnx', 'wb') as f:
+        f.write(model)
 
     return templates.TemplateResponse("/custommodel.html", {"request":request})
 
@@ -187,8 +182,4 @@ async def search_model_name(model_name):
 @app.delete("/result/delete/all", response_description="delete all Device")
 async def delete_all():
     delete_results = await db["all_data"].delete_many({})
-
-    if delete_results.deleted_count == 1:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-    raise HTTPException(status_code=404, detail=f"Result not found")
+    return delete_results

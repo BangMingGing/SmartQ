@@ -79,7 +79,7 @@
                 alert('Please select valid image file !');
                 return false;
             }
-
+            console.log(payload)
             const res = await fetch(location.origin + '/home/get_inference_page/inference_request', {
                 method: 'POST',
                 headers: {

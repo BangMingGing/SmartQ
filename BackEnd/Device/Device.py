@@ -80,8 +80,6 @@ if __name__ == '__main__':
     
     run_process = sys.argv[1]
 
-    message = {'message' : 'hello'}
-
     process = IoT_Device(device_name=run_process)
     process.Consume()
 

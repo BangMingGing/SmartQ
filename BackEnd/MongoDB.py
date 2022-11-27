@@ -1,4 +1,3 @@
-import sys
 import pika
 import pickle
 from pymongo import MongoClient

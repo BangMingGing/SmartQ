@@ -36,6 +36,7 @@ class Task_worker():
         sum_exp_a = np.sum(exp_a)
         return exp_a / sum_exp_a
 
+
     def preprocess(self, x):
         return self.img2tensor(x)
 
