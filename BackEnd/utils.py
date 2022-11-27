@@ -1,6 +1,5 @@
 import pika
 import pickle
-
 from bson import ObjectId
 from pydantic import BaseModel, Field
 from typing import List
@@ -66,12 +65,10 @@ class ResultModel(BaseModel):
             }
         }
 
-
 # Request Modele of Inference's image file and model names
 class InferenceRequest(BaseModel):
     image: str 
     model_names: List[str]
-
 
 # Request Model of Custom Model's onnx file and model name
 class CustomModelRequest(BaseModel):
