@@ -26,7 +26,6 @@ class Publisher():
             body = pickle.dumps({'header' : self.header, 'message' : message})
         )
 
-
 # Used in below ResultModel, it gives primary key of each results
 class ResultID(ObjectId):
     @classmethod
@@ -42,7 +41,6 @@ class ResultID(ObjectId):
     @classmethod
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
-
 
 # Response Model of search result
 class ResultModel(BaseModel):
