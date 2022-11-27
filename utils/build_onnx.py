@@ -14,3 +14,7 @@ def build_onnx(build_model_names):
 
         torch.onnx.export(model, dummy_input, f'../onnxfile/{model_name}.onnx', input_names=["input"], output_names=["output"])
         print(f"{model_name}.onnx build complete")
+
+
+if __name__ == '__main__':
+    build_onnx(build_model_names)
