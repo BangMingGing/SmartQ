@@ -5,13 +5,11 @@ import motor.motor_asyncio
 import pika
 import numpy as np
 
-from bson import ObjectId
+
 from fastapi import FastAPI, status, Request
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, Field
 from typing import List
-
-import Publish
+import SmartQ.BackEnd.utils as ut
 
 
 # RabbitMQ
@@ -32,53 +30,6 @@ MONGODB_SERVER_PORT = 27017
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_SERVER_IP, MONGODB_SERVER_PORT)
 db = client['bmk']
-
-
-class ResultID(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid objectid")
-        return ObjectId(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
-
-
-class ResultModel(BaseModel):
-    id: ResultID = Field(default_factory=ResultID, alias="_id")
-    device_name: str = Field(...)
-    model_name: str = Field(...)
-    result: str = Field(...)
-    work_time: str = Field(...)
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "device_name": "drone",
-                "model_name": "drone information",
-                "result": {"location" : "123.123.123", "altitude" : "123", "longtitude" : "345"},
-                "work_time": "1.234",
-            }
-        }
-
-
-class InferenceRequest(BaseModel):
-    image: str 
-    model_names: List[str]
-
-
-class CustomModelRequest(BaseModel):
-    onnx: str
-    custom_model_name: str
 
 
 templates = Jinja2Templates(directory="../FrontEnd")
@@ -115,7 +66,7 @@ async def custom_model_page(request : Request):
 
 
 @app.post("/home/get_inference_page/inference_request", status_code=status.HTTP_200_OK)
-async def inference_request(request: Request, req: InferenceRequest):
+async def inference_request(request: Request, req: ut.InferenceRequest):
 
     # save_image(req.image)
     req.image = req.image[req.image.find(',') + 1:]
@@ -124,7 +75,7 @@ async def inference_request(request: Request, req: InferenceRequest):
     cv2.imwrite('../images/inference_image.jpg', img)
     
     # publish_image()
-    Publisher_image = Publish.Publisher('image', 'input', '')
+    Publisher_image = ut.Publisher('image', 'input', '')
     with open('../images/inference_image.jpg', 'rb') as f:
         contents = f.read()
     message = {}
@@ -133,7 +84,7 @@ async def inference_request(request: Request, req: InferenceRequest):
     Publisher_image.Publish(message)
 
     # publish_model()
-    Publisher_model = Publish.Publisher('model', 'input', '')
+    Publisher_model = ut.Publisher('model', 'input', '')
     for model in req.model_names:
         with open(f'../onnxfile/{model}.onnx', 'rb') as f:
             contents = f.read()
@@ -147,7 +98,7 @@ async def inference_request(request: Request, req: InferenceRequest):
 
 
 @app.post("/home/get_custom_model_page/save_custom_model", status_code=status.HTTP_200_OK)
-async def save_custom_model(request: Request, req: CustomModelRequest):
+async def save_custom_model(request: Request, req: ut.CustomModelRequest):
     print(req.custom_model_name)
     
     req.onnx = req.onnx[req.onnx.find(',') + 1:]

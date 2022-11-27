@@ -6,7 +6,7 @@ import time
 import subprocess
 
 sys.path.append('..')
-import Publish
+import SmartQ.BackEnd.utils as ut
 
 RABBITMQ_SERVER_IP = '203.255.57.129'
 RABBITMQ_SERVER_PORT = '5672'
@@ -27,7 +27,7 @@ class IoT_Device():
         # Queue-Exchange Binding
         self.channel.queue_bind(exchange=exchange_name, queue=device_name, routing_key=routing_key)
 
-        self.publisher = Publish.Publisher(header='result', exchange_name='output', routing_key='toMongoDB')
+        self.publisher = ut.Publisher(header='result', exchange_name='output', routing_key='toMongoDB')
 
 
     
