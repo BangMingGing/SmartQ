@@ -78,7 +78,7 @@
 
             payload.onnx = await fileContentPromise;
             console.log(payload)
-            const res = await fetch(location.origin + '/home/get_custom_model_page/save_custom_model', {
+            const res = await fetch(location.origin + '/home/get_custom_model_page/custom_model_request', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

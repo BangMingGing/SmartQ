@@ -32,15 +32,18 @@ client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_SERVER_IP, MONGODB_SERVE
 db = client['bmk']
 
 
+# FastAPI
 templates = Jinja2Templates(directory="../FrontEnd")
 app = FastAPI()
 
 
+# Get Home Page
 @app.get("/home")
 async def home_page(request : Request):
     context = {'request': request}
     return templates.TemplateResponse("/home.html", context)
 
+# Get Inference Page
 @app.get("/home/get_inference_page")
 async def inference_page(request : Request):
     model_path = glob.glob('../onnxfile/*.onnx')
@@ -49,15 +52,17 @@ async def inference_page(request : Request):
         model_tmp = model.replace('../onnxfile/', '')
         model_name = model_tmp.replace('.onnx', '')
         model_names.append(model_name)
-        print(model_name)
+        # print(model_name)
     context = {'request': request, 'model_names': model_names}
     return templates.TemplateResponse("/inference.html", context)
 
+# Get Search Result Page
 @app.get("/home/get_search_result_page")
 async def search_result_page(request : Request):
     context = {'request': request}
     return templates.TemplateResponse("/searchresult.html", context)
 
+# Get Custom Model Page
 @app.get("/home/get_custom_model_page")
 async def custom_model_page(request : Request):
     context = {'request': request}
@@ -65,16 +70,15 @@ async def custom_model_page(request : Request):
 
 
 
+# Inference request, it save image, publish image and models
 @app.post("/home/get_inference_page/inference_request", status_code=status.HTTP_200_OK)
 async def inference_request(request: Request, req: ut.InferenceRequest):
 
-    # save_image(req.image)
     req.image = req.image[req.image.find(',') + 1:]
     img = np.frombuffer(base64.b64decode(req.image), np.uint8)
     img = cv2.imdecode(img, cv2.IMREAD_COLOR)
     cv2.imwrite('../images/inference_image.jpg', img)
-    
-    # publish_image()
+
     Publisher_image = ut.Publisher('image', 'input', '')
     with open('../images/inference_image.jpg', 'rb') as f:
         contents = f.read()
@@ -83,7 +87,6 @@ async def inference_request(request: Request, req: ut.InferenceRequest):
     message['contents'] = contents
     Publisher_image.publish(message)
 
-    # publish_model()
     Publisher_model = ut.Publisher('model', 'input', '')
     for model in req.model_names:
         with open(f'../onnxfile/{model}.onnx', 'rb') as f:
@@ -97,19 +100,18 @@ async def inference_request(request: Request, req: ut.InferenceRequest):
     return templates.TemplateResponse("/inference.html", context)
 
 
-@app.post("/home/get_custom_model_page/save_custom_model", status_code=status.HTTP_200_OK)
-async def save_custom_model(request: Request, req: ut.CustomModelRequest):
+# Custom Model Request, it save custom onnx model
+@app.post("/home/get_custom_model_page/custom_model_request", status_code=status.HTTP_200_OK)
+async def custom_model_request(request: Request, req: ut.CustomModelRequest):
     print(req.custom_model_name)
     
     req.onnx = req.onnx[req.onnx.find(',') + 1:]
-    print(req.onnx[:100])
     model = np.frombuffer(base64.b64decode(req.onnx), np.uint8)
     with open(f'../onnxfile/{req.custom_model_name}.onnx', 'wb') as f:
         f.write(model)
 
     context = {'request': request}
     return templates.TemplateResponse("/custommodel.html", context)
-
 
 
 @app.get("/home/get_search_result_page/search_result/all", response_description="show all results", response_model=List[ut.ResultModel])

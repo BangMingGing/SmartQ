@@ -8,7 +8,7 @@ from typing import List
 RABBITMQ_SERVER_IP = '203.255.57.129'
 RABBITMQ_SERVER_PORT = '5672'
 
-
+# Publisher send messages node to node, it used in FastAPI(send image, model to Deivce), Device(send inference result to DB)
 class Publisher():
     def __init__(self, header, exchange_name, routing_key):
         self.credentials = pika.PlainCredentials('rabbitmq', '1q2w3e4r')
@@ -28,6 +28,7 @@ class Publisher():
         )
 
 
+# Used in below ResultModel, it gives primary key of each results
 class ResultID(ObjectId):
     @classmethod
     def __get_validators__(cls):
@@ -44,13 +45,14 @@ class ResultID(ObjectId):
         field_schema.update(type="string")
 
 
+# Response Model of search result
 class ResultModel(BaseModel):
     id: ResultID = Field(default_factory=ResultID, alias="_id")
     device_name: str = Field(...)
     model_name: str = Field(...)
     result: str = Field(...)
     work_time: str = Field(...)
-
+    
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
@@ -65,11 +67,13 @@ class ResultModel(BaseModel):
         }
 
 
+# Request Modele of Inference's image file and model names
 class InferenceRequest(BaseModel):
     image: str 
     model_names: List[str]
 
 
+# Request Model of Custom Model's onnx file and model name
 class CustomModelRequest(BaseModel):
     onnx: str
     custom_model_name: str
