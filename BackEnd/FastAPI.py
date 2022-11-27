@@ -9,7 +9,7 @@ import numpy as np
 from fastapi import FastAPI, status, Request
 from fastapi.templating import Jinja2Templates
 from typing import List
-import SmartQ.BackEnd.utils as ut
+import utils as ut
 
 
 # RabbitMQ
