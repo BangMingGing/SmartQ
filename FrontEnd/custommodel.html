@@ -1,97 +1,101 @@
 <html>
-<head>
-    <title>추론</title>
-</head>
-<body>
-    <script>
-        /**
-         * @param {string} formSelector
-         * @return {object | null}
-         */
-            function serializeForm(formSelector) {
-            const formElm = document.documentElement.querySelector(formSelector);
-            if (formElm === null) {
-                alert('failed to find form element');
-                return null;
-            }
-            const values = {};
-            for (const childElm of formElm.elements) {
-                if (!(childElm instanceof HTMLInputElement)) {
-                    continue;
+    <head>
+        <title>추론</title>
+    </head>
+    <body>
+        <script>
+            /**
+             * @param {string} formSelector
+             * @return {object | null}
+             */
+                function serializeForm(formSelector) {
+                const formElm = document.documentElement.querySelector(formSelector);
+                if (formElm === null) {
+                    alert('failed to find form element');
+                    return null;
                 }
-                switch (childElm.type.toLowerCase()) {
-                    case 'checkbox': {
-                        if (childElm.attributes.hasOwnProperty('data-group')) {
-                            const groupName = childElm.attributes['data-group'].value;
-                            if (!(groupName in values)) {
-                                values[groupName] = [];
-                            }
-
-                            if (childElm.checked) {
-                                values[groupName].push(childElm.value);
-                            }
-                        }
-                        else {
-                            values[childElm.name] = childElm.checked;
-                        }
-                        break;
+                const values = {};
+                for (const childElm of formElm.elements) {
+                    if (!(childElm instanceof HTMLInputElement)) {
+                        continue;
                     }
-                    case 'text': {
-                        values[childElm.name] = childElm.value;
-                        break;
+                    switch (childElm.type.toLowerCase()) {
+                        case 'checkbox': {
+                            if (childElm.attributes.hasOwnProperty('data-group')) {
+                                const groupName = childElm.attributes['data-group'].value;
+                                if (!(groupName in values)) {
+                                    values[groupName] = [];
+                                }
+
+                                if (childElm.checked) {
+                                    values[groupName].push(childElm.value);
+                                }
+                            }
+                            else {
+                                values[childElm.name] = childElm.checked;
+                            }
+                            break;
+                        }
+                        case 'text': {
+                            values[childElm.name] = childElm.value;
+                            break;
+                        }
                     }
                 }
+                return values;
             }
-            return values;
-        }
-        
-        function readAsBase64(file) {
-            return new Promise((resolve, reject) => {
-                if (!file)
-                    reject('invalid argument: file is invalid');
-                
-                const fileReader = new FileReader();
-                fileReader.addEventListener('load', () => {
-                    resolve(fileReader.result);
-                }, false);
-
-                fileReader.readAsDataURL(file);
-            });
-        }
-
-        async function requestToCustomModel() {
-            const [file] = document.documentElement.querySelector('#inf-form input[type="file"]')?.files;
-            if (!file) 
-                return false;
             
-            const fileContentPromise = readAsBase64(file);
+            function readAsBase64(file) {
+                return new Promise((resolve, reject) => {
+                    if (!file)
+                        reject('invalid argument: file is invalid');
+                    
+                    const fileReader = new FileReader();
+                    fileReader.addEventListener('load', () => {
+                        resolve(fileReader.result);
+                    }, false);
 
-            const payload = serializeForm('#inf-form');
-            if (payload == null) {
-                return false;
+                    fileReader.readAsDataURL(file);
+                });
             }
-            payload.onnx = await fileContentPromise;
-            console.log(payload)
-            const res = await fetch(location.origin + '/home/get_custom_model_page/custom_model_request', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
-        }
-        
-    </script>
-    <h1>추론</h1>
-    <form id='inf-form' method='post' onsubmit='return (requestToCustomModel(), false);'>
-        <label for='text'>모델 업로드</label><br />
-        <input type='file' name='onnx_file' placeholder='upload onnx file'
-            required='required'><br /><br />
-        <input type='text' name='custom_model_name' placeholder='모델 별칭을 입력하시오'>
-        <br />
-        <br />
-        <input type='submit' name='submitButton' value='업로드'>
-        <input type='reset' value='초기화'>
-    </form>
-</body>
+
+            async function requestToCustomModel() {
+                const [file] = document.documentElement.querySelector('#inf-form input[type="file"]')?.files;
+                if (!file) 
+                    return false;
+                
+                const fileContentPromise = readAsBase64(file);
+
+                const payload = serializeForm('#inf-form');
+                if (payload == null) {
+                    return false;
+                }
+                payload.onnx = await fileContentPromise;
+                console.log(payload)
+                const res = await fetch(location.origin + '/home/get_custom_model_page/custom_model_request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+            }
+            
+        </script>
+        <h1>추론</h1>
+        <form id='inf-form' method='post' onsubmit='return (requestToCustomModel(), false);'>
+            <label for='text'>모델 업로드</label><br />
+            <input type='file' name='onnx_file' placeholder='upload onnx file'
+                required='required'><br /><br />
+            <input type='text' name='custom_model_name' placeholder='모델 별칭을 입력하시오'>
+            <br />
+            <br />
+            <input type='submit' name='submitButton' value='업로드'>
+            <input type='reset' value='초기화'>
+        </form>
+
+        <button onclick  = "location.href = 'http://203.255.57.129:8001/home'">Home</button>
+            <br>
+
+    </body>
 </html>

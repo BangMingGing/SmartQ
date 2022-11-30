@@ -17,7 +17,6 @@ class MongoDB():
         queue = self.channel.queue_declare(queue_name)
         self.channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=routing_key)
 
-        # MongoDB
         client = MongoClient(MONGODB_SERVER_IP, MONGODB_SERVER_PORT)
         db1 = client['bmk']
         self.all_data = db1.all_data
@@ -34,7 +33,6 @@ class MongoDB():
     def callback(self, ch, method, properties, body):
         message = pickle.loads(body, encoding='bytes')['message']
         
-        # DB에 저장하는 코드
         self.save_data(message)
         print(f'[MongoDB] message : {message}')
 
@@ -48,6 +46,3 @@ class MongoDB():
 if __name__ == '__main__':
     process = MongoDB()
     process.consume()
-
-
-    

@@ -64,6 +64,6 @@ if __name__ == '__main__':
     with open('imagenet_classes.txt', 'r') as f:
         categories = [s.strip() for s in f.readlines()]
 
-    print(f'object:{categories[class_name]}, accuracy:{accuracy*100}%')
+    print(f'object^{categories[class_name]}^accuracy^{accuracy*100}%')
     
     

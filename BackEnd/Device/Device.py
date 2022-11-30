@@ -51,11 +51,14 @@ class Device():
 
             start_time = time.time()
             try:
-                result_message['result'] = subprocess.check_output(model, shell=False, encoding='UTF-8').replace('\n', '/')
+                results = subprocess.check_output(model, shell=False, encoding='UTF-8')
             except Exception:
                 result_message['error'] = Exception
             result_message['work_time'] = time.time() - start_time
 
+            tmp = results.split('^')
+            result_message[tmp[0]] = tmp[1]
+            result_message[tmp[2]] = tmp[3]
 
             print('result : ', result_message)
 
