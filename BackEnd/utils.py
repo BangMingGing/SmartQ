@@ -26,42 +26,6 @@ class Publisher():
             body = pickle.dumps({'header' : self.header, 'message' : message})
         )
 
-# Used in below ResultModel, it gives primary key of each results
-class ResultID(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid objectid")
-        return ObjectId(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
-
-# Response Model of search result
-class ResultModel(BaseModel):
-    id: ResultID = Field(default_factory=ResultID, alias="_id")
-    device_name: str = Field(...)
-    model_name: str = Field(...)
-    result: str = Field(...)
-    work_time: str = Field(...)
-    
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "device_name": "drone",
-                "model_name": "drone information",
-                "result": {"location" : "123.123.123", "altitude" : "123", "longtitude" : "345"},
-                "work_time": "1.234",
-            }
-        }
 
 # Request Modele of Inference's image file and model names
 class InferenceRequest(BaseModel):

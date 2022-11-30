@@ -35,6 +35,7 @@ templates = Jinja2Templates(directory="../FrontEnd")
 app = FastAPI()
 
 
+# Get Home Pages
 @app.get("/home")
 async def home_page(request : Request):
     context = {'request': request}
@@ -113,7 +114,7 @@ async def save_custom_model(request: Request, req: ut.CustomModelRequest):
 
 
 @app.get("/home/get_search_result_page/search_result/all", 
-    response_description="show all results", response_model=List[ut.ResultModel])
+    response_description="show all results")
 async def search_all(request: Request):
     results = await db['all_data'].find().to_list(1000)
     if len(results) != 0:
@@ -125,9 +126,15 @@ async def search_all(request: Request):
         context = {'request': request, 'keys': keys, 'values': values}
         return templates.TemplateResponse("/searchresult.html", context)
 
+    else:
+        keys = []
+        values = []
+        context = {'request': request, 'keys': keys, 'values': values}
+        return templates.TemplateResponse("/searchresult.html", context)
+
 
 @app.get("/home/get_search_result_page/search_result/device_name", 
-    response_description="show device_name results", response_model=List[ut.ResultModel])
+    response_description="show device_name results")
 async def search_device_name(request: Request, device_name):
     results = await db["all_data"].find({"device_name" : device_name}).to_list(1000)
     if len(results) != 0:
@@ -138,10 +145,15 @@ async def search_device_name(request: Request, device_name):
 
         context = {'request': request, 'keys': keys, 'values': values}
         return templates.TemplateResponse("/searchresult.html", context)
-    
+
+    else:
+        keys = []
+        values = []
+        context = {'request': request, 'keys': keys, 'values': values}
+        return templates.TemplateResponse("/searchresult.html", context)
 
 @app.get("/home/get_search_result_page/search_result/model_name", 
-    response_description="show model_name results", response_model=List[ut.ResultModel])
+    response_description="show model_name results")
 async def search_model_name(request: Request, model_name):
     results = await db["all_data"].find({"model_name" : model_name}).to_list(1000)
     if len(results) != 0:
@@ -150,6 +162,12 @@ async def search_model_name(request: Request, model_name):
         for result in results:
             values.append(result.values())
 
+        context = {'request': request, 'keys': keys, 'values': values}
+        return templates.TemplateResponse("/searchresult.html", context)
+
+    else:
+        keys = []
+        values = []
         context = {'request': request, 'keys': keys, 'values': values}
         return templates.TemplateResponse("/searchresult.html", context)
     
