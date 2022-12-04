@@ -85,7 +85,7 @@
         <h1>추론</h1>
         <form id='inf-form' method='post' onsubmit='return (requestToCustomModel(), false);'>
             <label for='text'>모델 업로드</label><br />
-            <input type='file' name='onnx_file' placeholder='upload onnx file'
+            <input type='file' name='onnx_file' accept='.onnx' placeholder='upload onnx file'
                 required='required'><br /><br />
             <input type='text' name='custom_model_name' placeholder='모델 별칭을 입력하시오'>
             <br />

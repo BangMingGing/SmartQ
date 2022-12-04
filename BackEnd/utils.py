@@ -1,7 +1,6 @@
 import pika
 import pickle
-from bson import ObjectId
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import List
 
 RABBITMQ_SERVER_IP = '203.255.57.129'
