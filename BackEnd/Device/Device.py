@@ -36,6 +36,7 @@ class Device():
     
     def callback(self, ch, method, properties, body):
         global test_end
+        global test_start
         test_end = time.time()
         print('total_time : ', test_end - test_start)
         msg = pickle.loads(body, encoding='bytes')
@@ -77,7 +78,7 @@ class Device():
             print("image saved")
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
-        global test_start
+        
         test_start = time.time()
 
     def consume(self):
