@@ -1,5 +1,6 @@
 import pika
 import pickle
+import time
 from pymongo import MongoClient
 
 RABBITMQ_SERVER_IP = '203.255.57.129'
@@ -33,7 +34,11 @@ class MongoDB():
     def callback(self, ch, method, properties, body):
         message = pickle.loads(body, encoding='bytes')['message']
         
+        start = time.time()
         self.save_data(message)
+        end = time.time() - start
+        print("time : ", end)
+
         print(f'[MongoDB] message : {message}')
 
         ch.basic_ack(delivery_tag=method.delivery_tag)

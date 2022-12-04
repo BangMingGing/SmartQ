@@ -38,10 +38,13 @@ class Device():
         message = msg['message']
         model_name = message['model_name']
         contents = message['contents']
+        test_start_time = message['time']
 
         if header == 'model':
             with open(f'{model_name}', 'wb') as f:
                 f.write(contents)
+
+            print('total time(model) : ', time.time() - test_start_time)
 
             model = ['python', 'Inference_worker.py', model_name, 'inference_image.jpg']
 
@@ -68,6 +71,7 @@ class Device():
         elif header == 'image':
             with open('inference_image.jpg', 'wb') as f:
                 f.write(contents)
+            print('total time(image) : ', time.time() - test_start_time)
             print("image saved")
 
         ch.basic_ack(delivery_tag=method.delivery_tag)

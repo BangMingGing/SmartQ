@@ -1,6 +1,7 @@
 import base64
 import cv2
 import glob
+import time
 import motor.motor_asyncio
 import pika
 import numpy as np
@@ -81,6 +82,7 @@ async def inference_request(request: Request, req: ut.InferenceRequest):
     with open('../images/inference_image.jpg', 'rb') as f:
         contents = f.read()
     message = {}
+    message['time'] = time.time()
     message['model_name'] = 'inference_image.jpg'
     message['contents'] = contents
     Publisher_image.publish(message)
@@ -90,6 +92,7 @@ async def inference_request(request: Request, req: ut.InferenceRequest):
         with open(f'../onnxfile/{model}.onnx', 'rb') as f:
             contents = f.read()
         message = {}
+        message['time'] = time.time()
         message['model_name'] = f'{model}.onnx'
         message['contents'] = contents
         Publisher_model.publish(message)
