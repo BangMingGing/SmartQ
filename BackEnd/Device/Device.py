@@ -42,7 +42,6 @@ class Device():
         msg = pickle.loads(body, encoding='bytes')
         header = msg['header']
         message = msg['message']
-        print('total time : ', time.time() - message['time'])
         model_name = message['model_name']
         contents = message['contents']
 
