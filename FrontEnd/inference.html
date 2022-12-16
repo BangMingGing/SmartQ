@@ -85,24 +85,123 @@
                     body: JSON.stringify(payload),
                 });
             }
+
+            function multiSelect(value){
+
+                if(value=="OPEN") {
+                    Div.style.visibility="visible";
+                    Div.style.position="relative";
+                }
+                else {
+                    Div.style.visibility="hidden";
+                    Div.style.position="absolute";
+                }
+            }
+
+        
         </script>
-        <h1>추론</h1>
-        <form id='inf-form' method='post' onsubmit='return (requestToInference(), false);'>
-            <label for='text'>이미지 업로드</label><br />
-            <input type='file' name='image_file' accept='image/*' placeholder='upload image'
-                required='required'><br /><br />
-            <label for='model_name'>AI 모델 선택</label><br />
-            {% for model in model_names %}
-                <input type='checkbox' data-group='model_names' value='{{model}}'>{{ model }}
-            {% endfor %}
-            <br />
-            <br />
-            <input type='submit' name='submitButton' value='추론 시작'>
-            <input type='reset' value='초기화'>
-        </form>
+        <style>
+            body {padding: auto; margin: auto;}
 
-        <button onclick  = "location.href = 'http://203.255.57.129:8001/home'">Home</button>
-            <br>
+            #divPosition{
+                background-color: rgb(129, 182, 231);
+                border: 3px;
+                position: absolute;
+                height: 400px;
+                width: 400px;
+                margin: -150px 0px 0px -200px;
+                top: 35%;
+                left: 50%;
+                padding: 5px;
+                border-radius: 2em;
+            }
 
+            #button{
+            width: 20%;
+            border: 0;
+            color: #277ef0;
+            outline: auto;
+            font-size: 15px;
+            flex-direction: column;
+            align-items: center;
+            font-weight: 600;
+            margin: 40px 0px 0px 250px;
+            }
+
+            #inferencebutton{
+            width: 40%;
+            border: 0;
+            color: #277ef0;
+            outline: auto;
+            font-size: 15px;
+            flex-direction: column;
+            align-items: center;
+            font-weight: 600;
+            }
+
+            .fileRegiBtn label {
+            display: inline-block; 
+            padding: .5em .75em; 
+            color: #ffffff; 
+            font-size: inherit; 
+            line-height: normal; 
+            vertical-align: middle; 
+            background-color: #277ef0; 
+            cursor: pointer; 
+            border: 1px solid #ebebeb; 
+            border-bottom-color: #e2e2e2; 
+            border-radius: .25em;
+            }
+
+            #select_model{
+                margin: 0px 100px 0px 100px;
+            }
+
+            select, ul { height: 100px; overflow: auto; width: 200px; border: 1px solid #000; }            
+            ul {list-style-type: none; margin: 0; padding: 0; overflow-x: hidden; }
+            li { margin: 0; padding: 0;}
+        </style>
+
+
+        <div id = "divPosition">
+
+            <center>
+
+            <h1 style="text-align: center;"> [Inference] </h1>
+
+            <form id='inf-form' method='post' onsubmit='return (requestToInference(), false);'>
+                <div class="fileRegiBtn">
+                    <label for="image_file">Upload IMG File</label>
+                    <input type="file" id="image_file" name ="image_file" accept='image/*' required='required' style="display: none">
+                </div>
+                
+                <br>
+                <br>
+                <div id='select_model' style="position :relative; font-size:12px;">
+                    <label>model select</label>
+                    <button onClick="multiSelect('OPEN')">▼</button>
+                    <br>
+                    <div id="Div" style="position :absolute; visibility:hidden; font-size:12px;">
+                        <div style="padding-top:3px;text-align:center">
+                            <ul>
+                                {% for model in model_names %}
+                                    <li><input type='checkbox' data-group='model_names' value='{{model}}'>{{ model }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div style="padding-top:3px;text-align:right">
+                            <input type="button" value="확인" onClick="multiSelect('CLOSE')">
+                        </div>
+                    </div>
+                </div>
+                
+                <br><br>
+                <button class = "button" id = "inferencebutton" type='reset'> Initialization </button>
+                <br><br>
+                <button class = "button" id = "inferencebutton" type='submit'> Start Inference </button>
+            </form>
+            <button class="button" id = "button" onclick  = "location.href = 'http://203.255.57.129:8001/home'">Home</button>
+            <center>
+        </div>
     </body>
 </html>
