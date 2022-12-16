@@ -117,13 +117,13 @@ async def save_custom_model(request: Request, req: ut.CustomModelRequest):
 
 @app.get("/home/get_search_result_page/search_result", 
     response_description="show all results")
-async def search_all(request: Request, search: str = 'default', text: str = 'default'):
-    if search == default:
+async def search_all(request: Request, search: str = 'default', keyword: str = 'default'):
+    if search == 'all':
         results = await db['all_data'].find().to_list(1000)
-    elif search == device_name:
-        results = await db["all_data"].find({"device_name" : text}).to_list(1000)
-    elif search == model_name:
-        results = await db["all_data"].find({"model_name" : text}).to_list(1000)
+    elif search == 'device_name':
+        results = await db["all_data"].find({"device_name" : keyword}).to_list(1000)
+    elif search == 'model_name':
+        results = await db["all_data"].find({"model_name" : keyword}).to_list(1000)
     
     if len(results) != 0:
         keys = results[0].keys()
