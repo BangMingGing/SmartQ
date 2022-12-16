@@ -2,37 +2,51 @@
     <head>
         <title>SmartQ</title>
     </head>
+    <style>
+        table.type09 {
+        border-collapse: collapse;
+        text-align: left;
+        line-height: 1.5;
+        }
+        table.type09 thead th {
+        padding: 10px;
+        font-weight: bold;
+        vertical-align: top;
+        color: #369;
+        border-bottom: 3px solid #036;
+        }
+        table.type09 td {
+        width: 350px;
+        padding: 10px;
+        vertical-align: top;
+        border-bottom: 1px solid #ccc;
+        }
+    </style>
     <body>
         <h1>결과 조회</h1>
-        <form action="http://203.255.57.129:8001/home/get_search_result_page/search_result/all">
-            <div class="search_all">
-                <button type="submit">전체 결과 조회</button>
+        <form method='GET'action="http://203.255.57.129:8001/home/get_search_result_page/search_result">
+            <div class = "search">
+                <select name='search'>
+                    <option value='all' selected>전체</option>
+                    <option value='device_name'>디바이스명</option>
+                    <option value='model_name'>모델명</option>
+                  </select>
+                  <input type="text" name="keyword" value="">
+                  <button type="submit">검색</button>
             </div>
         </form>
-        <form action="http://203.255.57.129:8001/home/get_search_result_page/search_result/model_name">
-            <div class="search_model_name">
-                <input type="text" name="model_name" value="">
-                <button type="submit">model_name으로 조회</button>
-            </div>
-        </form>
-        <form action="http://203.255.57.129:8001/home/get_search_result_page/search_result/device_name">
-            <div class="search_device_name">
-                <input type="text" name="device_name" value="">
-                <button type="submit">device_name으로 조회</button>
-            </div>
-        </form>
-        <form action="http://203.255.57.129:8001/home/get_search_result_page/search_result/delete_all">
-            <div class="search_device_name">
-                <button type="submit">결과 전체 삭제</button>
-            </div>
-        </form>
+        <button onclick  = "location.href = 'http://203.255.57.129:8001/home/get_search_result_page/search_result/delete_all'">결과 삭제</button>
+            <br>
 
-        <table>
+        <table class="type09">
+            <thead>
             <tr>
                 {% for key in keys %}
-                <td>{{key}}</td>
+                <th>{{key}}</th>
                 {% endfor %}
             </tr>
+            </thead>
+            <tbody>
             {% for value in values %}
             <tr>
                 {% for val in value %}
@@ -40,7 +54,8 @@
                 {% endfor %}
             </tr>
             {% endfor %}
-        </table>
+            </tbody>
+          </table>
 
         <button onclick  = "location.href = 'http://203.255.57.129:8001/home'">Home</button>
             <br>

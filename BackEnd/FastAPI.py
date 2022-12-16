@@ -82,7 +82,7 @@ async def inference_request(request: Request, req: ut.InferenceRequest):
     with open('../images/inference_image.jpg', 'rb') as f:
         contents = f.read()
     message = {}
-    message['time'] = time.time()
+    message['time'] = time.time() 
     message['model_name'] = 'inference_image.jpg'
     message['contents'] = contents
     Publisher_image.publish(message)
@@ -115,65 +115,32 @@ async def save_custom_model(request: Request, req: ut.CustomModelRequest):
     return templates.TemplateResponse("/custommodel.html", context)
 
 
-
-@app.get("/home/get_search_result_page/search_result/all", 
+@app.get("/home/get_search_result_page/search_result", 
     response_description="show all results")
-async def search_all(request: Request):
-    results = await db['all_data'].find().to_list(1000)
-    if len(results) != 0:
-        keys = results[0].keys()
-        values = []
-        for result in results:
-            values.append(result.values())
-
-        context = {'request': request, 'keys': keys, 'values': values}
-        return templates.TemplateResponse("/searchresult.html", context)
-
-    else:
-        keys = []
-        values = []
-        context = {'request': request, 'keys': keys, 'values': values}
-        return templates.TemplateResponse("/searchresult.html", context)
-
-
-@app.get("/home/get_search_result_page/search_result/device_name", 
-    response_description="show device_name results")
-async def search_device_name(request: Request, device_name):
-    results = await db["all_data"].find({"device_name" : device_name}).to_list(1000)
-    if len(results) != 0:
-        keys = results[0].keys()
-        values = []
-        for result in results:
-            values.append(result.values())
-
-        context = {'request': request, 'keys': keys, 'values': values}
-        return templates.TemplateResponse("/searchresult.html", context)
-
-    else:
-        keys = []
-        values = []
-        context = {'request': request, 'keys': keys, 'values': values}
-        return templates.TemplateResponse("/searchresult.html", context)
-
-@app.get("/home/get_search_result_page/search_result/model_name", 
-    response_description="show model_name results")
-async def search_model_name(request: Request, model_name):
-    results = await db["all_data"].find({"model_name" : model_name}).to_list(1000)
-    if len(results) != 0:
-        keys = results[0].keys()
-        values = []
-        for result in results:
-            values.append(result.values())
-
-        context = {'request': request, 'keys': keys, 'values': values}
-        return templates.TemplateResponse("/searchresult.html", context)
-
-    else:
-        keys = []
-        values = []
-        context = {'request': request, 'keys': keys, 'values': values}
-        return templates.TemplateResponse("/searchresult.html", context)
+async def search_all(request: Request, search: str = 'default', text: str = 'default'):
+    if search == default:
+        results = await db['all_data'].find().to_list(1000)
+    elif search == device_name:
+        results = await db["all_data"].find({"device_name" : text}).to_list(1000)
+    elif search == model_name:
+        results = await db["all_data"].find({"model_name" : text}).to_list(1000)
     
+    if len(results) != 0:
+        keys = results[0].keys()
+        values = []
+        for result in results:
+            values.append(result.values())
+
+        context = {'request': request, 'keys': keys, 'values': values}
+        return templates.TemplateResponse("/searchresult.html", context)
+
+    else:
+        keys = []
+        values = []
+        context = {'request': request, 'keys': keys, 'values': values}
+        return templates.TemplateResponse("/searchresult.html", context)
+
+
 @app.get("/home/get_search_result_page/search_result/delete_all", 
     response_description="delete all Device")
 async def delete_all(request: Request):
