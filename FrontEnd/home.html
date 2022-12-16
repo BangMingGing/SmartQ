@@ -1,14 +1,52 @@
 <html>
     <head>
-        <title>SmartQ</title>
-    </head>
+    <hr>
+        <h1 style="text-align: center;">소프트웨어 개발론 프로젝트</h1>
+    <hr>
+        <h2 style = "text-align: center;"> - Massive Thinks - </h2>
+    <style>
+        body {padding: auto; margin: auto;}
+
+        #divPosition{
+            background-color: rgb(129, 182, 231);
+            border: 3px;
+            position: absolute;
+            height: 300px;
+            width: 400px;
+            margin: -150px 0px 0px -200px;
+            top: 35%;
+            left: 50%;
+            padding: 5px;
+            border-radius: 2em;
+        }
+
+       button.button{
+            width: 50%;
+            border: 0;
+            outline: auto;
+            font-size: 20px;
+            flex-direction: column;
+            align-items: center;
+            font-weight: 600;
+            }
+
+    </style>
     <body>
-        <h1>SmartQ</h1>
-            <button onclick  = "location.href = 'http://203.255.57.129:8001/home/get_inference_page'">추론</button>
+        <div id = "divPosition">
+            <center>
             <br>
-            <button onclick  = "location.href = 'http://203.255.57.129:8001/home/get_search_result_page'">결과 조회</button>
+            <h2>[ SmartQ ]</h2>
             <br>
-            <button onclick  = "location.href = 'http://203.255.57.129:8001/home/get_custom_model_page'">커스텀 모델 업로드</button>
+            <button class = "button" onclick  = "location.href = 'http://203.255.57.129:8001/home/get_inference_page'">Inference</button>
             <br>
+            <br>
+            <button class = "button" onclick  = "location.href = 'http://203.255.57.129:8001/home/get_search_result_page'">Search Result</button>
+            <br>
+            <br>
+            <button class = "button" onclick  = "location.href = 'http://203.255.57.129:8001/home/get_custom_model_page'">Custom Model</button>
+            <br>
+            <br>
+            </center>
+        </div>
     </body>
 </html>
