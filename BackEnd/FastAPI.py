@@ -130,14 +130,15 @@ async def search_all(request: Request, search: str = 'default', keyword: str = '
         values = []
         for result in results:
             values.append(result.values())
-
-        context = {'request': request, 'keys': keys, 'values': values}
+        delete_key = [1]
+        context = {'request': request, 'keys': keys, 'values': values, 'deletekey': delete_key}
         return templates.TemplateResponse("/searchresult.html", context)
 
     else:
         keys = []
         values = []
-        context = {'request': request, 'keys': keys, 'values': values}
+        delete_key = [0]
+        context = {'request': request, 'keys': keys, 'values': values, 'deletekey': delete_key}
         return templates.TemplateResponse("/searchresult.html", context)
 
 

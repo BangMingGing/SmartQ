@@ -2,11 +2,41 @@
     <head>
         <title>SmartQ</title>
     </head>
+    <script>
+        function multiSelect(value){
+            if(value=="OPEN") {
+                Div.style.visibility="visible";
+                Div.style.position="relative";
+            }
+            else {
+                Div.style.visibility="hidden";
+                Div.style.position="absolute";
+            }
+        }
+    </script>
     <style>
         table.type09 {
         border-collapse: collapse;
         text-align: left;
         line-height: 1.5;
+        }
+        #delete {
+        margin: 10px 0px 0px 0px;
+        border: 0;
+        color: #277ef0;
+        outline: auto;
+        font-size: 20px;
+        flex-direction: column;
+        align-items: center;
+        }
+        #home {
+        margin: -30px 0px 0px 1400px;
+        border: 0;
+        color: #277ef0;
+        outline: auto;
+        font-size: 20px;
+        flex-direction: column;
+        align-items: center;
         }
         table.type09 thead th {
         padding: 10px;
@@ -21,23 +51,44 @@
         vertical-align: top;
         border-bottom: 1px solid #ccc;
         }
+        #divPosition{
+        background-color: rgb(129, 182, 231);
+        border: 3px;
+        position: relative;
+        width: 400px;
+        margin: 0px 0px 0px -200px;
+        top: 0%;
+        left: 50%;
+        padding: 5px;
+        border-radius: 2em;
+        }
+        img {
+        position : relative;
+        width: 17px;
+        top: 0px;
+        right: 0px;
+        margin: 0;
+        }
     </style>
     <body>
-        <h1>결과 조회</h1>
-        <form method='GET'action="http://203.255.57.129:8001/home/get_search_result_page/search_result">
-            <div class = "search">
-                <select name='search'>
-                    <option value='all' selected>전체</option>
-                    <option value='device_name'>디바이스명</option>
-                    <option value='model_name'>모델명</option>
-                  </select>
-                  <input type="text" name="keyword" value="">
-                  <button type="submit">검색</button>
-            </div>
-        </form>
-        <button onclick  = "location.href = 'http://203.255.57.129:8001/home/get_search_result_page/search_result/delete_all'">결과 삭제</button>
-            <br>
-
+        <div id = "divPosition">
+            <center>
+            <h1> [ Search Result ] </h1>
+            <form method='GET'action="http://203.255.57.129:8001/home/get_search_result_page/search_result">
+                <div class = "search">
+                    <select name='search'>
+                        <option value='all' selected>ALL</option>
+                        <option value='device_name'>Device Name</option>
+                        <option value='model_name'>Model Name</option>
+                    </select>
+                    <input type="search" name="keyword" value="Enter KeyWord">
+                    <button class="img-button" type="submit" onclick="multiSelect('OPEN')"><img src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png"></button>
+                    <br>  
+                    <br>
+                </div>
+            </form>
+            </center>
+        </div>
         <table class="type09">
             <thead>
             <tr>
@@ -55,9 +106,13 @@
             </tr>
             {% endfor %}
             </tbody>
-          </table>
-
-        <button onclick  = "location.href = 'http://203.255.57.129:8001/home'">Home</button>
-            <br>
+        </table>
+        {% if deletekey == [1] %}
+            <button class = "button" id = 'delete' onclick  = "location.href = 'http://203.255.57.129:8001/home/get_search_result_page/search_result/delete_all'">Delete Result</button>
+        {% else %}
+        {% endif %}
+        <br>
+        <button class = "button" id  = 'home' onclick  = "location.href = 'http://203.255.57.129:8001/home'">Home</button>
+        <br>
     </body>
 </html>

@@ -72,30 +72,86 @@
                 }
                 payload.onnx = await fileContentPromise;
                 console.log(payload)
-                const res = await fetch(location.origin + '/home/get_custom_model_page/custom_model_request', {
+                alert("Uploading Model")
+                const res = await fetch(location.origin + '/home/get_custom_model_page/save_custom_model', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(payload),
                 });
+                alert("Upload Complete")     
             }
             
         </script>
-        <h1>추론</h1>
-        <form id='inf-form' method='post' onsubmit='return (requestToCustomModel(), false);'>
-            <label for='text'>모델 업로드</label><br />
-            <input type='file' name='onnx_file' accept='.onnx' placeholder='upload onnx file'
-                required='required'><br /><br />
-            <input type='text' name='custom_model_name' placeholder='모델 별칭을 입력하시오'>
-            <br />
-            <br />
-            <input type='submit' name='submitButton' value='업로드'>
-            <input type='reset' value='초기화'>
-        </form>
+        <style>
 
-        <button onclick  = "location.href = 'http://203.255.57.129:8001/home'">Home</button>
-            <br>
-
+        #home {
+        margin: 375px 0px 0px 900px;
+        position :absolute;
+        border: 0;
+        color: #277ef0;
+        outline: auto;
+        font-size: 15px;
+        flex-direction: column;
+        align-items: center;
+        }          
+        #divPosition{
+            background-color: rgb(129, 182, 231);
+            border: 3px;
+            position: absolute;
+            height: 300px;
+            width: 400px;
+            margin: -150px 0px 0px -200px;
+            top: 35%;
+            left: 50%;
+            padding: 5px;
+            border-radius: 2em;
+        }
+        .fileRegiBtn label {
+            display: inline-block; 
+            padding: .5em .75em; 
+            color: #ffffff; 
+            font-size: inherit; 
+            line-height: normal; 
+            vertical-align: middle; 
+            background-color: #277ef0; 
+            cursor: pointer; 
+            border: 1px solid #ebebeb; 
+            border-bottom-color: #e2e2e2; 
+            border-radius: .25em;
+        }
+        
+        #button{
+            width: 40%;
+            border: 0;
+            color: #277ef0;
+            outline: auto;
+            font-size: 15px;
+            flex-direction: column;
+            align-items: center;
+            font-weight: 600;
+        }
+        </style>
+        <center>
+        <div id = "divPosition">
+            <h1> [ Custom model ] </h1>
+                <form id='inf-form' method='post' onsubmit='return (requestToCustomModel(), false);'>
+                    <div class="fileRegiBtn">
+                        <label for='onnx'>Upload Your onnx File</label>
+                        <input type='file' id ='onnx' name='onnx' accept='.onnx' required='required' style="display: none">
+                    </div>
+                    <br />
+                    <input type='text' name='custom_model_name' placeholder='모델 별칭을 입력하시오'>
+                    <br>
+                    <br>
+                    <button class="button" id = "button" type='reset' value='초기화'> Initialization </button>
+                    <br>
+                    <br>
+                    <button class="button" id = "button" type='submit' name='submitButton' value='업로드'> Start Upload </button>
+                </form>
+        </div>
+        </center>
+        <button class = "button" id  = 'home' onclick  = "location.href = 'http://203.255.57.129:8001/home'">Home</button>
     </body>
 </html>

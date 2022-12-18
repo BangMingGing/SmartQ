@@ -76,14 +76,13 @@
                     alert('Please select valid image file !');
                     return false;
                 }
-                console.log(payload)
                 const res = await fetch(location.origin + '/home/get_inference_page/inference_request', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(payload),
-                });
+                });               
             }
 
             function multiSelect(value){
@@ -97,14 +96,17 @@
                     Div.style.position="absolute";
                 }
             }
-
+            
+            function al(){
+                alert("추론 시작. 최대 1분 소요")
+            }
         
         </script>
         <style>
-            body {padding: auto; margin: auto;}
+            body {padding: auto; margin: auto; background-color: rgb(129, 182, 231);}
 
             #divPosition{
-                background-color: rgb(129, 182, 231);
+                background-color: rgb(219, 224, 229);
                 border: 3px;
                 position: absolute;
                 height: 400px;
@@ -175,10 +177,9 @@
                     <input type="file" id="image_file" name ="image_file" accept='image/*' required='required' style="display: none">
                 </div>
                 
-                <br>
-                <br>
+                <br><br>
                 <div id='select_model' style="position :relative; font-size:12px;">
-                    <label>model select</label>
+                    <label>Model Select</label>
                     <button onClick="multiSelect('OPEN')">▼</button>
                     <br>
                     <div id="Div" style="position :absolute; visibility:hidden; font-size:12px;">
@@ -198,7 +199,8 @@
                 <br><br>
                 <button class = "button" id = "inferencebutton" type='reset'> Initialization </button>
                 <br><br>
-                <button class = "button" id = "inferencebutton" type='submit'> Start Inference </button>
+                <button class = "button" id = "inferencebutton" type='submit' onclick="al()"> Start Inference </button>
+
             </form>
             <button class="button" id = "button" onclick  = "location.href = 'http://203.255.57.129:8001/home'">Home</button>
             <center>
